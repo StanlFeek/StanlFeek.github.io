@@ -127,9 +127,7 @@ select.input { cursor: pointer; }
 .auth-brand { text-align: center; margin-bottom: 24px; }
 .auth-brand .emblem {
   width: 64px; height: 64px; margin: 0 auto 12px; border-radius: 50%;
-  background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-  color: #fff; display: flex; align-items: center; justify-content: center;
-  font-size: 30px; font-weight: 700; box-shadow: 0 6px 18px rgba(29, 78, 216, .35);
+  object-fit: cover; display: block; box-shadow: 0 6px 18px rgba(29, 78, 216, .35);
 }
 .auth-brand h1 { font-size: 22px; color: var(--primary-dark); letter-spacing: 1px; }
 .auth-brand .sub { margin-top: 6px; font-size: 14px; color: var(--gold); font-weight: 700; letter-spacing: 4px; }
