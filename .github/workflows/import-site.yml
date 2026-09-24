@@ -18,9 +18,8 @@ jobs:
           rm -rf _incoming
           mkdir _incoming
           unzip -q site.zip -d _incoming
-          rsync -a --delete --exclude=".git" --exclude=".github/workflows/import-site.yml" --exclude="_incoming" --exclude="site.zip" _incoming/ ./
+          rsync -a --delete --exclude=".git" --exclude=".github/workflows" --exclude="_incoming" --exclude="site.zip" _incoming/ ./
           rm -f site.zip
-          rm -f .github/workflows/import-site.yml
       - name: Commit replacement
         run: |
           git config user.name "StanlFeek"
