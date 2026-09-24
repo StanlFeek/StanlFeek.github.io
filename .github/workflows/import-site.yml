@@ -1,0 +1,30 @@
+name: Import Hugo site
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  import-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Extract site archive
+        run: |
+          rm -rf _incoming
+          mkdir _incoming
+          unzip -q site.zip -d _incoming
+          rsync -a --delete --exclude=".git" --exclude="site.zip" --exclude=".github/workflows/import-site.yml" _incoming/ ./
+          rm -f site.zip
+          rm -f .github/workflows/import-site.yml
+      - name: Commit replacement
+        run: |
+          git config user.name "StanlFeek"
+          git config user.email "StanlFeek@users.noreply.github.com"
+          git add -A
+          git commit -m "replace old site with PaperMod blog" || exit 0
+          git push
