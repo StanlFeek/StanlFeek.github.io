@@ -3,3 +3,142 @@
 .entry-cover img {
   border: 1px solid var(--border);
 }
+
+/* Article updates */
+.post-updates {
+  margin-top: 3rem;
+  padding-top: 2rem;
+  border-top: 1px solid var(--border);
+}
+
+.updates-header {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+}
+
+.updates-header h2 {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.updates-header p {
+  margin: .35rem 0 0;
+  color: var(--secondary);
+  font-size: .9rem;
+}
+
+.updates-count {
+  flex: none;
+  padding: .2rem .65rem;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  color: var(--secondary);
+  font-size: .8rem;
+}
+
+.updates-list {
+  display: grid;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.update-item {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(0, 1fr);
+  gap: .75rem;
+}
+
+.update-avatar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: 50%;
+  background: var(--primary);
+  color: var(--theme);
+  font-weight: 700;
+}
+
+.update-comment {
+  min-width: 0;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--entry);
+}
+
+.update-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem;
+  margin-bottom: .65rem;
+  color: var(--secondary);
+  font-size: .82rem;
+}
+
+.update-version {
+  padding: .12rem .5rem;
+  border-radius: 999px;
+  background: var(--code-bg);
+  color: var(--primary);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-weight: 600;
+}
+
+.update-title {
+  margin: 0 0 .7rem;
+  font-size: 1.05rem;
+  line-height: 1.5;
+}
+
+.update-comment p {
+  margin: .65rem 0;
+}
+
+.update-label {
+  margin-top: 1rem !important;
+  font-weight: 600;
+}
+
+.update-changes {
+  margin: .45rem 0 .8rem;
+  padding-left: 1.25rem;
+}
+
+.update-note {
+  margin-top: .9rem;
+  padding: .7rem .85rem;
+  border-left: 3px solid var(--primary);
+  background: var(--code-bg);
+  color: var(--secondary);
+}
+
+.update-upgrade {
+  color: var(--secondary);
+  font-size: .92rem;
+}
+
+@media (max-width: 500px) {
+  .updates-header {
+    align-items: flex-start;
+  }
+
+  .update-item {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: .55rem;
+  }
+
+  .update-avatar {
+    width: 2rem;
+    height: 2rem;
+    font-size: .8rem;
+  }
+
+  .update-comment {
+    padding: .85rem;
+  }
+}
