@@ -1,0 +1,5 @@
+/* Site-specific styles */
+
+.entry-cover img {
+  border: 1px solid var(--border);
+}

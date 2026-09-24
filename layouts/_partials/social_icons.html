@@ -1,0 +1,15 @@
+<div class="social-icons" {{ with .align}}align="{{.}}" {{- end }}>
+    {{- range site.Params.socialIcons }}
+    {{- if and .copy (in (slice "qq" "wechat") .name) }}
+    <button type="button" class="social-copy" data-copy="{{ .copy }}" data-feedback="{{ .feedback | default "已复制" }}"
+        title="{{ (.title | default .name) | title }}" aria-label="{{ (.title | default .name) | title }}">
+        {{ partial "svg.html" . }}
+    </button>
+    {{- else }}
+    <a href="{{ trim .url " " | safeURL }}" target="_blank" rel="noopener noreferrer me"
+        title="{{ (.title | default .name) | title }}">
+        {{ partial "svg.html" . }}
+    </a>
+    {{- end }}
+    {{- end }}
+</div>

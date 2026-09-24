@@ -1,0 +1,6 @@
+{{- /* Footer custom content area start */ -}}
+{{- with resources.Get "js/copy-contact.js" -}}
+{{- $js := . | fingerprint -}}
+<script defer src="{{ $js.RelPermalink }}"></script>
+{{- end -}}
+{{- /* Footer custom content area end */ -}}

@@ -1,0 +1,149 @@
+baseURL: "https://stanl.top/"
+title: "StanlFeek 的博客"
+copyright: "© 2024–2026 StanlFeek"
+enableRobotsTXT: true
+enableEmoji: true
+mainsections: ["posts"]
+defaultContentLanguage: zh
+defaultContentLanguageInSubdir: false
+
+pagination:
+  pagerSize: 6
+
+languages:
+  zh:
+    languageName: "中文"
+    languageCode: "zh-CN"
+    weight: 1
+    title: "StanlFeek 的博客"
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: 首页
+          url: /
+          weight: 1
+        - name: 文章
+          url: posts/
+          weight: 2
+        - name: 归档
+          url: archives/
+          weight: 3
+        - name: 标签
+          url: tags/
+          weight: 4
+        - name: 搜索
+          url: search/
+          weight: 5
+        - name: 关于
+          url: about/
+          weight: 6
+
+  en:
+    languageName: "English"
+    languageCode: "en-US"
+    weight: 2
+    title: "StanlFeek's Blog"
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: Home
+          url: /
+          weight: 1
+        - name: Posts
+          url: posts/
+          weight: 2
+        - name: Archive
+          url: archives/
+          weight: 3
+        - name: Tags
+          url: tags/
+          weight: 4
+        - name: Search
+          url: search/
+          weight: 5
+        - name: About
+          url: about/
+          weight: 6
+    params:
+      description: "My personal blog about technology, design, reading and making things."
+      author: "StanlFeek"
+      homeInfoParams:
+        Title: "Hi, I'm StanlFeek"
+        Content: "This is my personal blog."
+      socialIcons:
+        - name: github
+          title: GitHub
+          url: "https://github.com/StanlFeek"
+        - name: qq
+          title: "QQ: 2141077688"
+          copy: "2141077688"
+          feedback: "Copied"
+          url: ""
+        - name: wechat
+          title: "WeChat: stanlfeek"
+          copy: "stanlfeek"
+          feedback: "Copied"
+          url: ""
+        - name: telegram
+          title: "Telegram: @stanlfeek"
+          url: "https://t.me/stanlfeek"
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+params:
+  env: production
+  description: "记录技术、设计、阅读与长期主义的个人博客。"
+  author: "StanlFeek"
+  defaultTheme: auto
+  ShowShareButtons: true
+  ShowReadingTime: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  displayFullLangName: true
+
+  homeInfoParams:
+    Title: "你好，我是 StanlFeek"
+    Content: "这里是我的个人Blog"
+
+  socialIcons:
+    - name: github
+      title: GitHub
+      url: "https://github.com/StanlFeek"
+    - name: qq
+      title: "QQ: 2141077688"
+      copy: "2141077688"
+      feedback: "已复制"
+      url: ""
+    - name: wechat
+      title: "微信: stanlfeek"
+      copy: "stanlfeek"
+      feedback: "已复制"
+      url: ""
+    - name: telegram
+      title: "Telegram: @stanlfeek"
+      url: "https://t.me/stanlfeek"
+
+  assets:
+    disableHLJS: true
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
