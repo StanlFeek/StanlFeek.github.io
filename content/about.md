@@ -1,6 +1,5 @@
 ---
 title: "关于"
-url: "/about/"
 summary: "关于我"
 ---
 
