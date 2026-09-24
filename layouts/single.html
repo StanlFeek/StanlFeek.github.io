@@ -48,6 +48,8 @@
     {{- partial "social_icons.html" (dict "align" "") }}
   </footer>
 
+  {{- partial "updates.html" . }}
+
   {{- if (.Param "comments") }}
   {{- partial "comments.html" . }}
   {{- end }}
