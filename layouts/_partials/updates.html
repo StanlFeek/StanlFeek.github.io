@@ -1,0 +1,43 @@
+{{- $key := .File.TranslationBaseName }}
+{{- with index site.Data.updates $key }}
+<section class=post-updates aria-labelledby=updates-heading>
+  <header class=updates-header>
+    <div>
+      <h2 id=updates-heading>更新日志</h2>
+      <p>记录这个项目发布后的重要改动</p>
+    </div>
+    <span class=updates-count>{{ len . }} 条记录</span>
+  </header>
+  <div class=updates-list>
+    {{- range . }}
+    <article class=update-item>
+      <div class=update-avatar aria-hidden=true>V</div>
+      <div class=update-comment>
+        <header class=update-meta>
+          <span class=update-version>v{{ .version }}</span>
+          <time datetime={{ .date }}>{{ .date }}</time>
+        </header>
+        <h3 class=update-title>{{ .title }}</h3>
+        {{- range .paragraphs }}
+        <p>{{ . | markdownify }}</p>
+        {{- end }}
+        {{- with .changes }}
+        <p class=update-label>细节调整</p>
+        <ul class=update-changes>
+          {{- range . }}
+          <li>{{ . | markdownify }}</li>
+          {{- end }}
+        </ul>
+        {{- end }}
+        {{- with .note }}
+        <div class=update-note>{{ . | markdownify }}</div>
+        {{- end }}
+        {{- with .upgrade }}
+        <p class=update-upgrade>{{ . | markdownify }}</p>
+        {{- end }}
+      </div>
+    </article>
+    {{- end }}
+  </div>
+</section>
+{{- end }}
