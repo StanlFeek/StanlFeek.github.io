@@ -2,6 +2,7 @@
 title: "你好，这是我的第一篇博客"
 date: 2026-09-24
 draft: false
+hideSummary: true
 author: "StanlFeek"
 tags: ["随笔", "开始"]
 categories: ["生活"]
