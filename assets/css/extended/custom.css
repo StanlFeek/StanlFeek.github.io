@@ -142,21 +142,3 @@
     padding: .85rem;
   }
 }
-
-.update-body p {
-  margin: .65rem 0;
-}
-
-.update-body ul,
-.update-body ol {
-  margin: .45rem 0 .8rem;
-  padding-left: 1.25rem;
-}
-
-.update-body li + li {
-  margin-top: .2rem;
-}
-
-.update-body a {
-  font-weight: 600;
-}
