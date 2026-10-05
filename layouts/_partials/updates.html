@@ -18,26 +18,26 @@
           <time datetime={{ .date }}>{{ .date }}</time>
         </header>
         <h3 class=update-title>{{ .title }}</h3>
-        {{- with .body }}
-        <div class=update-body>{{ . | markdownify }}</div>
-        {{- else }}
         {{- range .paragraphs }}
         <p>{{ . | markdownify }}</p>
         {{- end }}
+        {{- $changesLabel := .changesLabel | default "细节调整" }}
         {{- with .changes }}
-        <p class=update-label>细节调整</p>
+        <p class=update-label>{{ $changesLabel }}</p>
         <ul class=update-changes>
           {{- range . }}
           <li>{{ . | markdownify }}</li>
           {{- end }}
         </ul>
         {{- end }}
+        {{- range .afterChanges }}
+        <p>{{ . | markdownify }}</p>
+        {{- end }}
         {{- with .note }}
         <div class=update-note>{{ . | markdownify }}</div>
         {{- end }}
         {{- with .upgrade }}
         <p class=update-upgrade>{{ . | markdownify }}</p>
-        {{- end }}
         {{- end }}
       </div>
     </article>
