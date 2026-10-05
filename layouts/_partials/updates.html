@@ -18,6 +18,9 @@
           <time datetime={{ .date }}>{{ .date }}</time>
         </header>
         <h3 class=update-title>{{ .title }}</h3>
+        {{- with .body }}
+        <div class=update-body>{{ . | markdownify }}</div>
+        {{- else }}
         {{- range .paragraphs }}
         <p>{{ . | markdownify }}</p>
         {{- end }}
@@ -34,6 +37,7 @@
         {{- end }}
         {{- with .upgrade }}
         <p class=update-upgrade>{{ . | markdownify }}</p>
+        {{- end }}
         {{- end }}
       </div>
     </article>
