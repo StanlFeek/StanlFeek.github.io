@@ -45,6 +45,8 @@
 {{- $pages = where $pages "Params.hiddenInHomeList" "!=" "true"  }}
 {{- end }}
 
+{{- $pages = $pages.ByPublishDate.Reverse }}
+{{- $pages = union (where $pages "Params.pinLast" "ne" true) (where $pages "Params.pinLast" true) }}
 {{- $paginator := .Paginate $pages }}
 
 {{- if and .IsHome site.Params.homeInfoParams (eq $paginator.PageNumber 1) }}

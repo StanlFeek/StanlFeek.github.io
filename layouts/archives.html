@@ -52,7 +52,9 @@
       <sup class="archive-count">&nbsp;{{ len .Pages }}</sup>
     </h3>
     <div class="archive-posts">
-      {{- range .Pages }}
+      {{- $monthPages := .Pages.ByPublishDate.Reverse }}
+      {{- $monthPages = union (where $monthPages "Params.pinLast" "ne" true) (where $monthPages "Params.pinLast" true) }}
+      {{- range $monthPages }}
       {{- if eq .Kind "page" }}
       <div class="archive-entry">
         <h3 class="archive-entry-title entry-hint-parent">
