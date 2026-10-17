@@ -6,6 +6,7 @@ enableEmoji: true
 mainsections: ["posts"]
 defaultContentLanguage: zh
 defaultContentLanguageInSubdir: false
+timeZone: "Asia/Shanghai"
 
 pagination:
   pagerSize: 6
