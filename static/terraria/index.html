@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#070a12">
+<meta name="description" content="泰拉瑞亚风格沙盒冒险游戏：挖掘、建造、战斗。">
+<title>泰拉瑞亚 · 深渊世界</title>
+<style>
+  :root { color-scheme: dark; }
+  html, body { width: 100%; height: 100%; margin: 0; padding: 0; background: #070a12; overflow: hidden; }
+  iframe { display: block; width: 100%; height: 100%; border: 0; background: #070a12; }
+  .fallback { position: fixed; inset: 0; display: none; align-items: center; justify-content: center; color: #f4d58d; font: 16px/1.7 "Microsoft YaHei", sans-serif; text-align: center; padding: 24px; }
+  .fallback a { color: #f4d58d; }
+  @supports not (height: 100dvh) { iframe { height: 100vh; } }
+</style>
+</head>
+<body>
+<iframe src="https://stanl.top/terraria-deepseek-v4.1-flash/" title="泰拉瑞亚 · 深渊世界" allow="autoplay; fullscreen; gamepad" allowfullscreen></iframe>
+<div class="fallback" id="fallback">游戏加载失败，<a href="https://stanl.top/terraria-deepseek-v4.1-flash/">点此直接进入</a>。</div>
+<script>
+  const frame = document.querySelector('iframe');
+  const fallback = document.getElementById('fallback');
+  const timer = setTimeout(() => {
+    fallback.style.display = 'flex';
+  }, 8000);
+  frame.addEventListener('load', () => clearTimeout(timer));
+</script>
+</body>
+</html>
