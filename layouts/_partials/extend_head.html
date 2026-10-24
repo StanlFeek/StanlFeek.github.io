@@ -2,3 +2,15 @@
 {{- /*     Insert any custom code (web-analytics, resources, etc.) - it will appear in the <head></head> section of every page. */ -}}
 {{- /*     Can be overwritten by partial with the same name in the global layouts. */ -}}
 {{- /* Head custom content area end */ -}}
+{{- if .IsHome }}
+<script>
+    (() => {
+        if (location.hash || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        try { if (sessionStorage.getItem('blog-intro-seen')) return; } catch (_) {}
+        document.documentElement.classList.add('intro-pending');
+        window.blogIntroFallback = setTimeout(() => document.documentElement.classList.remove('intro-pending'), 4000);
+    })();
+</script>
+{{- $intro := resources.Get "js/intro.js" | resources.Minify | fingerprint }}
+<script defer src="{{ $intro.RelPermalink }}" integrity="{{ $intro.Data.Integrity }}" crossorigin="anonymous"></script>
+{{- end }}

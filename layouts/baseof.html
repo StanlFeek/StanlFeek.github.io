@@ -21,6 +21,7 @@
 {{- else }}
 <body id="top">
 {{- end }}
+    {{- if .IsHome }}{{ partial "intro.html" . }}{{ end }}
     {{ partialCached "header.html" . .Page -}}
     <main class="main">
         {{- block "main" . }}{{ end }}

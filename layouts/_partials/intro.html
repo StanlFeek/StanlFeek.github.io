@@ -1,0 +1,19 @@
+{{- $english := eq .Lang "en" -}}
+<section id="site-intro" class="site-intro" role="dialog" aria-modal="true" aria-labelledby="intro-title" hidden>
+    <canvas class="intro-particles intro-backdrop" aria-hidden="true"></canvas>
+    <div class="intro-surface">
+        <div class="intro-wordmark" aria-hidden="true">StanlFeek<span>/</span></div>
+        <div class="intro-copy">
+            <p class="intro-code" aria-hidden="true"><span>print</span>(<span>"Hello, World"</span>)<span class="intro-cursor">_</span></p>
+            <h1 id="intro-title"><span>Hello,</span> <span>World<span class="intro-period">.</span></span></h1>
+            <p class="intro-name">{{ if $english }}Hi, I'm StanlFeek{{ else }}你好，我是 StanlFeek{{ end }}</p>
+        </div>
+        <button class="intro-enter" type="button" title="{{ if $english }}Enter blog{{ else }}进入博客{{ end }}">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <polyline points="17 11 12 6 7 11"></polyline>
+                <polyline points="17 18 12 13 7 18"></polyline>
+            </svg>
+            <span>{{ if $english }}Enter blog{{ else }}进入博客{{ end }}</span>
+        </button>
+    </div>
+</section>
