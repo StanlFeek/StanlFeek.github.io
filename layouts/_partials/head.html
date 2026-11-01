@@ -85,11 +85,31 @@
 {{- end -}}
 
 {{- /* Favicons */}}
+{{- /* Favicons：直接取 QQ 头像（site.Params.avatarQQ）。换 QQ 头像后图标自动跟随，不用重新部署。 */}}
+{{- with site.Params.avatarQQ }}
+{{- $qq := . }}
+<link rel="icon" href="https://q1.qlogo.cn/g?b=qq&nk={{ $qq }}&s=140" id="qq-favicon">
+<link rel="apple-touch-icon" sizes="640x640" href="https://q1.qlogo.cn/g?b=qq&nk={{ $qq }}&s=640" id="qq-touch-icon">
+<script>
+  (() => {
+    // qlogo 的 Cache-Control 是 30 天。把缓存键按小时滚动，
+    // 换掉 QQ 头像后，最迟下一个整点浏览器就会重新取到新图。
+    const QQ = '{{ $qq }}';
+    const v = Math.floor(Date.now() / 36e5);
+    const url = (s) => 'https://q1.qlogo.cn/g?b=qq&nk=' + QQ + '&s=' + s + '&v=' + v;
+    const fav = document.getElementById('qq-favicon');
+    const touch = document.getElementById('qq-touch-icon');
+    if (fav) fav.href = url(140);
+    if (touch) touch.href = url(640);
+  })();
+</script>
+{{- else }}
 <link rel="icon" href="{{ site.Params.assets.favicon | default "favicon.ico" | absURL }}">
 <link rel="icon" type="image/png" sizes="16x16" href="{{ site.Params.assets.favicon16x16 | default "favicon-16x16.png" | absURL }}">
 <link rel="icon" type="image/png" sizes="32x32" href="{{ site.Params.assets.favicon32x32 | default "favicon-32x32.png" | absURL }}">
 <link rel="apple-touch-icon" href="{{ site.Params.assets.apple_touch_icon | default "apple-touch-icon.png" | absURL }}">
 <link rel="mask-icon" href="{{ site.Params.assets.safari_pinned_tab | default "safari-pinned-tab.svg" | absURL }}">
+{{- end }}
 <meta name="theme-color" content="{{ site.Params.assets.theme_color | default "#2e2e33" }}">
 <meta name="msapplication-TileColor" content="{{ site.Params.assets.msapplication_TileColor | default "#2e2e33" }}">
 

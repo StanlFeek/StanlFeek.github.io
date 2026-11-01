@@ -117,6 +117,10 @@ params:
   ShowToc: true
   displayFullLangName: true
 
+  # QQ 号：站点图标（favicon / apple-touch-icon）直接取这个号的 QQ 头像。
+  # 换 QQ 头像后不需要重新部署，更博后最迟 1 小时站点图标自动跟随。
+  avatarQQ: "2141077688"
+
   homeInfoParams:
     Title: "你好，我是 StanlFeek"
     Content: "这里是我的个人Blog"

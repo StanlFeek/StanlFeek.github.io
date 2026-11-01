@@ -6,16 +6,23 @@
   "name": {{ site.Title }},
   "url": {{ site.Home.Permalink }},
   "description": {{ site.Params.description | plainify | truncate 180 | safeHTML }},
+  {{- $brandIcon := site.Params.assets.favicon | default "favicon.ico" | absURL }}
+  {{- with site.Params.avatarQQ }}{{ $brandIcon = printf "https://q1.qlogo.cn/g?b=qq&nk=%s&s=640" . }}{{ end }}
   {{- if (eq site.Params.schema.publisherType "Person") }}
-  "image": {{ site.Params.assets.favicon | default "favicon.ico" | absURL }},
+  "image": {{ $brandIcon }},
   {{- else }}
-  "logo": {{ site.Params.assets.favicon | default "favicon.ico" | absURL }},
+  "logo": {{ $brandIcon }},
   {{- end }}
   "sameAs": [
     {{- if site.Params.schema.sameAs }}
       {{ range $i, $e := site.Params.schema.sameAs }}{{ if $i }}, {{ end }}{{ trim $e " " }}{{ end }}
     {{- else}}
-      {{ range $i, $e := site.Params.SocialIcons }}{{ if $i }}, {{ end }}{{ trim $e.url " " | safeURL }}{{ end }}
+      {{- $urls := slice }}
+      {{- range site.Params.SocialIcons }}
+        {{- $u := trim (.url | default "") " " }}
+        {{- if $u }}{{ $urls = $urls | append $u }}{{ end }}
+      {{- end }}
+      {{ range $i, $e := $urls }}{{ if $i }}, {{ end }}{{ $e | safeURL }}{{ end }}
     {{- end}}
   ]
 }
