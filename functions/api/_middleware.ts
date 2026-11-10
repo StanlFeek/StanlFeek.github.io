@@ -9,6 +9,9 @@ export interface Env {
   KV: KVNamespace;
   ADMIN_TOKEN?: string;
   SITE_NAME?: string;
+  /** Resend API Key；不配则注册走「无邮件模式」（不需要验证码） */
+  RESEND_API_KEY?: string;
+  MAIL_FROM?: string;
 }
 
 const ALLOWED_ORIGINS = new Set([
@@ -20,7 +23,8 @@ function corsHeaders(origin: string | null): Record<string, string> {
   const allow = origin && ALLOWED_ORIGINS.has(origin) ? origin : "https://stanl.top";
   return {
     "access-control-allow-origin": allow,
-    "access-control-allow-methods": "GET, POST, DELETE, OPTIONS",
+    "access-control-allow-credentials": "true",
+    "access-control-allow-methods": "GET, POST, PATCH, DELETE, OPTIONS",
     "access-control-allow-headers": "content-type, authorization",
     "access-control-max-age": "86400",
     vary: "origin",

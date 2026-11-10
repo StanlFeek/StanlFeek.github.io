@@ -138,9 +138,6 @@
         return wrap;
       }
 
-      form.appendChild(field("nickname", "昵称 *", "text", true));
-      form.appendChild(field("email", "邮箱（可选，不公开）", "email", false));
-      form.appendChild(field("website", "网址（可选）", "url", false));
       form.appendChild(field("content", "留言 *", "textarea", true));
 
       // 蜜罐
@@ -157,6 +154,34 @@
 
       var status = el("p", "c-status");
       form.appendChild(status);
+
+      // 登录状态下隐藏昵称/邮箱/网址，匿名访客才显示
+      function paintIdentity() {
+        var u = window.STANL_USER;
+        qsa(".c-ident", form).forEach(function (n) {
+          n.parentNode.removeChild(n);
+        });
+        if (u) {
+          var note = el("p", "c-ident c-signed", "以 " + u.nickname + " 的身份发表（已验证）");
+          form.insertBefore(note, form.firstChild);
+        } else {
+          var n1 = field("nickname", "昵称 *", "text", true);
+          var n2 = field("email", "邮箱（可选，不公开）", "email", false);
+          var n3 = field("website", "网址（可选）", "url", false);
+          n1.classList.add("c-ident");
+          n2.classList.add("c-ident");
+          n3.classList.add("c-ident");
+          form.insertBefore(n1, form.firstChild);
+          form.insertBefore(n2, n1.nextSibling);
+          form.insertBefore(n3, n2.nextSibling);
+        }
+      }
+
+      if (window.STANL_AUTH_READY && window.STANL_AUTH_READY.then) {
+        window.STANL_AUTH_READY.then(paintIdentity);
+      } else {
+        paintIdentity();
+      }
 
       form.addEventListener("submit", function (e) {
         e.preventDefault();
@@ -182,7 +207,14 @@
           .then(function (res) {
             if (!res.ok) throw new Error(res.d.error || "提交失败");
             status.textContent = "已发布 ✓";
+            var text = data.content;
             form.reset();
+            // 让留言板的弹幕立刻飞一条
+            document.dispatchEvent(
+              new CustomEvent("stanl:comment", {
+                detail: { nickname: res.d.nickname || data.nickname, content: text },
+              })
+            );
             load();
           })
           .catch(function (err) {

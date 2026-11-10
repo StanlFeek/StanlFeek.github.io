@@ -1,0 +1,258 @@
+/* 账号 / 登录页 / 管理后台 */
+
+.auth-card {
+  max-width: 640px;
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+}
+
+.auth-h2 {
+  margin: 0 0 1rem;
+  font-size: 1.15rem;
+}
+
+.auth-tabs {
+  display: flex;
+  gap: 0.4rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.auth-tab {
+  padding: 0.4rem 0.9rem;
+  font-size: 0.9rem;
+  color: var(--secondary);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.auth-tab:hover {
+  color: var(--primary);
+  border-color: var(--primary);
+}
+
+.auth-tab.active {
+  color: #fff;
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.auth-form {
+  margin: 0;
+}
+
+.auth-field {
+  display: block;
+  margin-bottom: 0.85rem;
+}
+
+.auth-label {
+  display: block;
+  margin-bottom: 0.3rem;
+  font-size: 0.82rem;
+  color: var(--secondary);
+}
+
+.auth-input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font-size: 0.95rem;
+  color: var(--primary);
+  background: var(--theme);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-sizing: border-box;
+}
+
+.auth-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+.auth-code-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.auth-code-row .auth-input {
+  flex: 1;
+}
+
+.auth-btn {
+  display: inline-block;
+  padding: 0.55rem 1.1rem;
+  margin-top: 0.4rem;
+  font-size: 0.92rem;
+  color: #fff;
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  border-radius: var(--radius);
+  cursor: pointer;
+  text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+
+.auth-btn:hover {
+  opacity: 0.85;
+}
+
+.auth-btn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.auth-btn.ghost {
+  color: var(--primary);
+  background: transparent;
+}
+
+.auth-btn.small {
+  margin-top: 0;
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.auth-btn.tiny {
+  margin: 0 0.25rem 0.25rem 0;
+  padding: 0.25rem 0.55rem;
+  font-size: 0.78rem;
+}
+
+.auth-btn.ok {
+  background: #2f9e5f;
+  border-color: #2f9e5f;
+}
+
+.auth-btn.danger {
+  background: #c94f4f;
+  border-color: #c94f4f;
+}
+
+.auth-status {
+  min-height: 1.4rem;
+  margin: 0.8rem 0 0;
+  font-size: 0.88rem;
+  color: var(--secondary);
+}
+
+.auth-info {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 1rem;
+  font-size: 0.92rem;
+  color: var(--secondary);
+}
+
+.auth-actions {
+  display: flex;
+  gap: 0.6rem;
+  flex-wrap: wrap;
+}
+
+/* ── 管理后台 ─────────────────────────────────────── */
+
+.admin-stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+  gap: 0.6rem;
+  margin: 1rem 0 1.2rem;
+}
+
+.admin-stat {
+  padding: 0.8rem;
+  text-align: center;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+}
+
+.admin-stat strong {
+  display: block;
+  font-size: 1.35rem;
+  color: var(--primary);
+}
+
+.admin-stat span {
+  font-size: 0.78rem;
+  color: var(--secondary);
+}
+
+.admin-panel {
+  overflow-x: auto;
+  margin-top: 0.6rem;
+}
+
+.admin-table {
+  width: 100%;
+  min-width: 680px;
+  border-collapse: collapse;
+  font-size: 0.86rem;
+}
+
+.admin-table th,
+.admin-table td {
+  padding: 0.5rem 0.55rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--border);
+}
+
+.admin-table th {
+  font-weight: 600;
+  color: var(--secondary);
+  white-space: nowrap;
+}
+
+.admin-dim {
+  color: var(--secondary);
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.admin-content {
+  min-width: 200px;
+  max-width: 340px;
+  word-break: break-word;
+}
+
+.admin-status {
+  white-space: nowrap;
+  font-size: 0.78rem;
+}
+
+.admin-status.approved {
+  color: #2f9e5f;
+}
+
+.admin-status.pending {
+  color: #d18b23;
+}
+
+.admin-status.spam,
+.admin-status.rejected {
+  color: #c94f4f;
+}
+
+.admin-ops {
+  white-space: nowrap;
+}
+
+.admin-empty {
+  padding: 1.2rem;
+  text-align: center;
+  color: var(--secondary);
+}
+
+.admin-note {
+  font-size: 0.84rem;
+  color: var(--secondary);
+}

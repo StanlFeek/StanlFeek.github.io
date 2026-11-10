@@ -7,6 +7,7 @@
  */
 
 import type { Env } from "../_middleware";
+import { currentUser } from "../auth/_lib";
 
 const MAX_CONTENT = 2000;
 const MAX_NICK = 40;
@@ -61,7 +62,7 @@ export const onRequestGet: PagesFunction<Env> = async ({ request, env }) => {
 
   const { results } = await env.DB
     .prepare(
-      `SELECT id, nickname, website, content, created_at, reply_to, reply_content
+      `SELECT id, nickname, website, content, created_at, reply_to, reply_content, user_id
          FROM comments
         WHERE path = ?1 AND status = 'approved'
         ORDER BY id DESC
@@ -92,17 +93,23 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
   }
 
   const path = str(body.path, 512);
-  const nickname = str(body.nickname, MAX_NICK);
   const content = str(body.content, MAX_CONTENT);
-  if (!path || !nickname || !content) {
-    return json({ error: "path / nickname / content required" }, 400);
+  if (!path || !content) {
+    return json({ error: "path / content required" }, 400);
   }
 
-  const email = optStr(body.email, 200);
+  // 登录用户：昵称/邮箱/网址一律取账号里的，杜绝冒名
+  const user = await currentUser(request, env);
+  const nickname = user ? user.nickname : str(body.nickname, MAX_NICK);
+  if (!nickname) {
+    return json({ error: "nickname required" }, 400);
+  }
+
+  const email = user ? user.email : optStr(body.email, 200);
   if (email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return json({ error: "invalid email" }, 400);
   }
-  const website = safeUrl(optStr(body.website, MAX_SITE));
+  const website = user ? null : safeUrl(optStr(body.website, MAX_SITE));
 
   // 同一 IP 10 秒内只能发一条
   // 注意：KV 的 expirationTtl 最小 60 秒，所以值里存时间戳，自己做 10 秒窗口判断
@@ -115,13 +122,22 @@ export const onRequestPost: PagesFunction<Env> = async ({ request, env }) => {
 
   const res = await env.DB
     .prepare(
-      `INSERT INTO comments (path, nickname, email, website, content)
-       VALUES (?1, ?2, ?3, ?4, ?5)`
+      `INSERT INTO comments (path, nickname, email, website, content, user_id)
+       VALUES (?1, ?2, ?3, ?4, ?5, ?6)`
     )
-    .bind(path, nickname, email, website, content)
+    .bind(path, nickname, email, website, content, user ? user.id : null)
     .run();
 
   await env.KV.put(rlKey, String(Date.now()), { expirationTtl: 60 });
 
-  return json({ ok: true, id: res.meta.last_row_id, email: maskEmail(email) }, 201);
+  return json(
+    {
+      ok: true,
+      id: res.meta.last_row_id,
+      email: maskEmail(email),
+      nickname,
+      verified: Boolean(user),
+    },
+    201
+  );
 };

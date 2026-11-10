@@ -47,6 +47,9 @@ languages:
         - name: 关于
           url: about/?v=2
           weight: 8
+        - name: 登录
+          url: login/
+          weight: 9
 
   en:
     languageName: "English"
@@ -83,6 +86,9 @@ languages:
         - name: About
           url: about/?v=2
           weight: 8
+        - name: Sign in
+          url: login/
+          weight: 9
     params:
       description: "My personal blog about technology, design, reading and making things."
       author: "StanlFeek"

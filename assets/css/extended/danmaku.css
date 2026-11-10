@@ -1,0 +1,106 @@
+/* 留言板弹幕 */
+
+[data-danmaku] {
+  position: relative;
+  margin: 1.5rem 0 2rem;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--entry);
+  overflow: hidden;
+}
+
+.dm-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0.9rem;
+  font-size: 0.78rem;
+  color: var(--secondary);
+  border-bottom: 1px dashed var(--border);
+}
+
+.dm-bar-title::before {
+  content: "▶ ";
+  color: var(--primary);
+}
+
+.dm-stage {
+  position: relative;
+  height: 240px;
+  overflow: hidden;
+}
+
+.dm-item {
+  position: absolute;
+  left: 0;
+  white-space: nowrap;
+  font-size: 0.92rem;
+  line-height: 1.4;
+  padding: 0.15rem 0;
+  will-change: transform;
+  animation: dm-fly var(--dm-dur, 12s) linear forwards;
+}
+
+.dm-name {
+  margin-right: 0.4rem;
+  font-weight: 600;
+}
+
+.dm-name::after {
+  content: "：";
+  color: var(--secondary);
+  font-weight: 400;
+}
+
+.dm-text {
+  color: var(--primary);
+}
+
+@keyframes dm-fly {
+  from {
+    transform: translateX(var(--dm-from, 100vw));
+  }
+  to {
+    transform: translateX(-100%);
+  }
+}
+
+.dm-empty {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  font-size: 0.85rem;
+  color: var(--secondary);
+  pointer-events: none;
+}
+
+/* 减少动态效果：不做飘屏，改成静态列表 */
+.dm-static .dm-item {
+  display: none;
+}
+
+.dm-static-item {
+  padding: 0.35rem 0.9rem;
+  font-size: 0.88rem;
+  color: var(--primary);
+  border-bottom: 1px dashed var(--border);
+}
+
+@media (max-width: 640px) {
+  .dm-stage {
+    height: 210px;
+  }
+  .dm-item {
+    font-size: 0.86rem;
+  }
+}
+
+/* 登录态提示 */
+.c-signed {
+  margin: 0 0 0.6rem;
+  font-size: 0.84rem;
+  color: var(--secondary);
+}

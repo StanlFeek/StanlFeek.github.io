@@ -22,6 +22,9 @@ stanl.top 从 GitHub Pages 迁到 Cloudflare Pages + Functions + D1 + R2 + KV �
 | `_headers` 缓存与安全头 | ✅ 已生效 |
 | 推送到 main 自动部署 | ✅ `Deploy to Cloudflare Pages` 已跑通（secrets 已写入） |
 | 泰拉瑞亚游戏并入 `static/` | ✅ `/terraria/` 入口与 `/terraria-deepseek-v4.1-flash/` 均可访问 |
+| 用户系统（邮箱注册/登录/会话） | ✅ `users`/`sessions`/`email_codes` 三表已建，`/api/auth/*` 全部实测 |
+| 后台 `/admin/`（留言·友链审核 + 用户管理） | ✅ 首个注册用户自动成为 admin |
+| 留言弹幕 | ✅ 留言板顶部飘屏，发新留言即时飞入 |
 | R2 `stanl-images` | ⛔ 按决定不启用（账号未绑支付方式，站点不用相册） |
 
 **线上站点：https://stanl.top**（www 会 301 跳到它）—— 留言、友链、浏览量、搜索、`/terraria/` 全部实测可用。
@@ -323,7 +326,88 @@ git clone D:\Backup\stanl-top-backup-20261110-1550\repo-all.bundle restored-site
 
 ---
 
-## 6. 已知限制
+## 6. 用户系统与留言弹幕
+
+### 6.1 建表（一次）
+
+```powershell
+# 注意：执行 D1 命令要 unset 掉 Pages 令牌，走 wrangler OAuth 登录态，否则 code 10000
+Remove-Item Env:CLOUDFLARE_API_TOKEN -ErrorAction SilentlyContinue
+cd D:\Backup\Documents\ChatGPT\website\StanlFeek.github.io
+npx wrangler d1 execute stanl-blog --remote --file=./schema-auth.sql
+```
+
+`schema-auth.sql` 建四样东西：`users`、`sessions`、`email_codes`，
+以及给 `comments` 补一列 `user_id`（重复执行会报 `duplicate column name: user_id`，可忽略）。
+
+### 6.2 账号规则
+
+- 注册用邮箱 + 昵称 + 密码（8–200 位），密码存 PBKDF2-SHA256 十万轮：
+  `pbkdf2$100000$<saltB64>$<hashB64>`，迭代次数写在串里，以后调整不影响老口令。
+- **数据库里第一个注册的用户自动 `role=admin`**，之后注册的都是普通用户。
+- 会话存在 `sessions` 表，cookie 名 `sid`（`HttpOnly; Secure; SameSite=Lax`，30 天）。
+  存储的是 token 的 sha256，库里拿不到可用 token。
+- 登录态下发留言时，昵称与邮箱强制取自账号，`website` 忽略 —— 防冒名。
+  后台会把这条留言标成「已验证」。
+
+### 6.3 邮件验证码（可选）
+
+当前 `RESEND_API_KEY` 没配，`/api/auth/config` 返回 `codeRequired:false`，
+**注册直接放行**（不校验验证码）。要给真实验证码：
+
+```powershell
+# 1) 在 resend.com 建 API Key，验证发信域名（如 mail.stanl.top）
+# 2) 存进 Pages 项目
+npx wrangler pages secret put RESEND_API_KEY --project-name stanl-top
+npx wrangler pages secret put MAIL_FROM --project-name stanl-top   # 形如 Blog <noreply@mail.stanl.top>
+```
+
+配完之后 `codeRequired` 自动变 `true`，注册页会多出「验证码」一行 + 60 秒倒计时按钮。
+（发信域名如果不验证，Resend 只允许发给自己的账号邮箱。）
+
+### 6.4 后台入口与两种鉴权
+
+- 页面：`https://stanl.top/admin/`（导航里没有入口，只能直接输地址；`sitemap: disable`）
+- 权限判断在 `functions/api/admin/_middleware.ts`，两条路都行：
+  1. 浏览器 cookie 里的 `sid` 对应 `users.role='admin'`
+  2. 请求头 `Authorization: Bearer <ADMIN_TOKEN>`（脚本 / curl 用）
+- 能做到：留言审核（通过/垃圾/删除）、友链审核（通过/拒绝）、用户管理（封禁/解封、升/降管理员）。
+  不允许把自己停用或降级。
+
+```powershell
+# 用令牌直接调接口
+$tok = (Get-Content .admin-token.txt -Raw).Trim()
+curl.exe -sS "https://stanl.top/api/admin/overview" -H "Authorization: Bearer $tok"
+curl.exe -sS "https://stanl.top/api/admin/comments?status=pending" -H "Authorization: Bearer $tok"
+```
+
+### 6.5 留言弹幕
+
+`content/guestbook.md` 里那个 `<div data-danmaku data-path="/guestbook/"></div>`
+会被 `assets/js/danmaku.js` 接管：拉同一套 `/api/comments`，把每条留言按昵称 hash 分色、
+分轨道从右向左飘过；提交新留言时通过 `stanl:comment` 自定义事件即时补一条。
+`prefers-reduced-motion` 打开时退化成静态列表（不飘，只列）。
+
+### 6.6 接口速查
+
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| GET | `/api/auth/config` | `{codeRequired}`，决定注册页要不要验证码 |
+| POST | `/api/auth/send-code` | `{email}` → 发 6 位验证码（无密钥时 `mailSent:false`） |
+| POST | `/api/auth/register` | `{email,nickname,password,code?}` → 201 + Set-Cookie |
+| POST | `/api/auth/login` | `{email,password}` → 200 + Set-Cookie |
+| POST | `/api/auth/logout` | 删会话 + 清 cookie |
+| GET | `/api/auth/me` | `{ok,user\|null}` |
+| GET/PATCH/DELETE | `/api/admin/comments` | 审核列表 / 改状态 / 删 |
+| GET/PATCH | `/api/admin/links` | 友链审核 |
+| GET/PATCH | `/api/admin/users` | 用户列表 / 封禁·角色 |
+| GET | `/api/admin/overview` | 留言·待审·友链·用户·总浏览 |
+
+删除单条留言仍走 `DELETE /api/comments/<id>`（带令牌），`?id=` 形式返回 405。
+
+---
+
+## 7. 已知限制
 
 - Functions 单请求 CPU：Free 10ms / Paid 30s（本项目最重的接口是留言查询，远低于）
 - 无常驻进程：需要实时（WebSocket 广播）就得用 Durable Objects

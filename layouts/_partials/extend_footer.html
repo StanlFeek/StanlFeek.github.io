@@ -4,6 +4,18 @@
 <script defer src="{{ $js.RelPermalink }}"></script>
 {{- end -}}
 
+{{- /* 账号态：顶栏登录入口 / 用户昵称 */ -}}
+{{- with resources.Get "js/auth.js" -}}
+{{- $js := . | fingerprint -}}
+<script defer src="{{ $js.RelPermalink }}"></script>
+{{- end -}}
+
+{{- /* 留言板弹幕 */ -}}
+{{- with resources.Get "js/danmaku.js" -}}
+{{- $js := . | fingerprint -}}
+<script defer src="{{ $js.RelPermalink }}"></script>
+{{- end -}}
+
 {{- /* Cloudflare 动态能力：浏览量 / 留言 / 友链申请 */ -}}
 {{- with resources.Get "js/dynamic.js" -}}
 {{- $js := . | fingerprint -}}

@@ -13,4 +13,6 @@ ShowPostNavLinks: false
 
 Leave a note here — anything is welcome.
 
+<div data-danmaku data-path="/en/guestbook/"></div>
+
 <div data-comments data-path="/en/guestbook/"></div>
