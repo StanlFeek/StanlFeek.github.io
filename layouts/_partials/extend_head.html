@@ -6,7 +6,12 @@
 <script>
     (() => {
         if (location.hash || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-        try { if (sessionStorage.getItem('blog-intro-seen')) return; } catch (_) {}
+        // 显式刷新（F5 / Ctrl+R）一定重放首屏；站内跳回首页则尊重本会话的「已看过」。
+        const nav = performance.getEntriesByType && performance.getEntriesByType('navigation')[0];
+        const isReload = nav ? nav.type === 'reload' : (performance.navigation && performance.navigation.type === 1);
+        if (!isReload) {
+            try { if (sessionStorage.getItem('blog-intro-seen')) return; } catch (_) {}
+        }
         document.documentElement.classList.add('intro-pending');
         window.blogIntroFallback = setTimeout(() => document.documentElement.classList.remove('intro-pending'), 4000);
     })();

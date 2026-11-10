@@ -199,18 +199,42 @@
             ['We are all in the gutter, but some of us are looking at the stars.', 'Oscar Wilde'],
             ['What is past is prologue.', 'William Shakespeare'],
             ['Life is not what one lived, but what one remembers.', 'García Márquez'],
+            ['There is only one heroism in the world: to see the world as it is, and to love it.', 'Romain Rolland'],
+            ['You can\u2019t leave this world to the people you despise.', 'Ayn Rand'],
+            ['He who has a why to live can bear almost any how.', 'Friedrich Nietzsche'],
+            ['There is a crack in everything, that\u2019s how the light gets in.', 'Leonard Cohen'],
+            ['It always seems impossible until it\u2019s done.', 'Nelson Mandela'],
+            ['The best time to plant a tree was twenty years ago. The second best time is now.', 'Chinese proverb'],
             ['Slow is smooth, smooth is fast.', 'Unknown'],
-            ['Keep the love, head for the mountains and the sea.', 'Unknown']
+            ['Keep the love, head for the mountains and the sea.', 'Unknown'],
+            ['Amateurs sit and wait for inspiration, the rest of us just get up and go to work.', 'Stephen King'],
+            ['Simplicity is the ultimate sophistication.', 'Leonardo da Vinci']
         ]
         : [
             ['星光不问赶路人，时光不负有心人。', '佚名'],
             ['凡是过往，皆为序章。', '莎士比亚'],
             ['我们都在阴沟里，但仍有人仰望星空。', '王尔德'],
             ['生活不是我们活过的日子，而是我们记住的日子。', '马尔克斯'],
+            ['世界上只有一种英雄主义，就是看清生活的真相后依然热爱生活。', '罗曼·罗兰'],
+            ['你不能把这个世界让给你所鄙视的人。', '安·兰德'],
+            ['一个人知道自己为什么而活，就可以忍受任何一种生活。', '尼采'],
+            ['万物皆有裂痕，那是光照进来的地方。', '莱昂纳德·科恩'],
+            ['在事情做成以前，一切看起来都不可能。', '曼德拉'],
+            ['种一棵树最好的时间是十年前，其次是现在。', '佚名'],
+            ['人生如逆旅，我亦是行人。', '苏轼'],
+            ['路漫漫其修远兮，吾将上下而求索。', '屈原'],
+            ['高山仰止，景行行止。', '《诗经》'],
+            ['无用之用，方为大用。', '庄子'],
+            ['知之为知之，不知为不知，是知也。', '《论语》'],
+            ['岁月不居，时节如流。', '孔融'],
+            ['有些事，只能一个人做；有些关，只能一个人过。', '龙应台'],
             ['慢慢来，比较快。', '佚名'],
             ['日拱一卒，功不唐捐。', '佚名'],
             ['保持热爱，奔赴山海。', '佚名'],
-            ['愿你走出半生，归来仍是少年。', '佚名']
+            ['愿你走出半生，归来仍是少年。', '佚名'],
+            ['你若盛开，清风自来。', '佚名'],
+            ['只有非常努力，才能看起来毫不费力。', '佚名'],
+            ['把日子过成自己喜欢的样子。', '佚名']
         ];
 
     const greetingText = intro.querySelector('.intro-greeting-text');
