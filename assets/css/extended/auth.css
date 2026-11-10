@@ -270,3 +270,41 @@
 .post-single:has([data-admin]) {
     padding: 24px 26px 20px;
 }
+/* 危险操作：注销账号 */
+.danger-zone {
+    border-color: rgba(192, 57, 43, 0.32);
+}
+
+.danger-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    margin: 0 0 0.4rem;
+    color: #c0392b;
+}
+
+.auth-btn.danger {
+    background: #c0392b;
+    color: #fff;
+    border-color: #c0392b;
+}
+
+.auth-btn.danger:hover {
+    background: #a93226;
+}
+
+.auth-btn.danger.armed {
+    background: #7f1d13;
+    border-color: #7f1d13;
+}
+
+.auth-btn.danger[disabled] {
+    opacity: 0.6;
+}
+
+:root[data-theme="dark"] .danger-zone {
+    border-color: rgba(255, 110, 100, 0.36);
+}
+
+:root[data-theme="dark"] .danger-title {
+    color: #ff8a80;
+}

@@ -397,11 +397,13 @@ curl.exe -sS "https://stanl.top/api/admin/comments?status=pending" -H "Authoriza
 | POST | `/api/auth/register` | `{email,nickname,password,code?}` → 201 + Set-Cookie |
 | POST | `/api/auth/login` | `{email,password}` → 200 + Set-Cookie |
 | POST | `/api/auth/password` | `{current,next}` → 改自己的密码；成功后作废该账号全部旧会话，并发一个新 cookie |
+| POST | `/api/auth/delete` | `{password}` → 注销自己的账号；留言保留但解绑 `user_id`，会话清空、cookie 清除 |
 | POST | `/api/auth/logout` | 删会话 + 清 cookie |
 | GET | `/api/auth/me` | `{ok,user\|null}` |
 | GET/PATCH/DELETE | `/api/admin/comments` | 审核列表 / 改状态 / 删 |
 | GET/PATCH | `/api/admin/links` | 友链审核 |
 | GET/PATCH | `/api/admin/users` | 用户列表 / 封禁·角色 / `{id,password}` 重置密码 |
+| DELETE | `/api/admin/users?id=` | 管理员删除某个用户（不能删自己，不能删最后一个管理员） |
 | GET | `/api/admin/overview` | 留言·待审·友链·用户·总浏览 |
 
 改密码的几条规则（`functions/api/auth/password.ts`）：
@@ -410,6 +412,17 @@ curl.exe -sS "https://stanl.top/api/admin/comments?status=pending" -H "Authoriza
 - 新密码 ≥ 8 位，且不能和旧密码相同
 - 成功后 `DELETE FROM sessions WHERE user_id = ?`，再为当前浏览器重建一条——所以**其他设备会被踢下线**
 - 后台「用户管理」里的「重置密码」走 `PATCH /api/admin/users {id,password}`；管理员重置自己时保留当前会话，重置别人时清空对方全部会话
+
+注销账号的几条规则（`functions/api/auth/delete.ts`）：
+
+- 入口在 `/login/`（登录后自动显示「账号」面板）和后台「账号」标签，两处复用同一个组件
+- 必须输入当前密码；前端要**连点两次**才真的提交（第一次把按钮改成「再点一次确认注销」）
+- 输错密码累计 5 次锁 15 分钟（KV `del:<userId>`）
+- **最后一个管理员不能注销**，返回 `400 {"error":"last-admin"}`——防止站点失去唯一管理员
+- 留言保留，只把 `comments.user_id` 置 `NULL`：昵称文字还在，但不再显示「已验证」
+- 会话全删、cookie 清空；同一个人在别的设备上也会立刻掉线
+- 管理员在「用户管理」里也能删人（`DELETE /api/admin/users?id=`），但不能删自己（提示去「账号」页），同样不能删最后一个管理员
+
 
 
 删除单条留言仍走 `DELETE /api/comments/<id>`（带令牌），`?id=` 形式返回 405。

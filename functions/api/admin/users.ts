@@ -81,3 +81,41 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
 
   return json({ ok: true, id });
 };
+
+// DELETE /api/admin/users?id=<id> —— 管理员删除某个用户（不能删自己，不能删最后一个管理员）
+export const onRequestDelete: PagesFunction<Env> = async ({ request, env }) => {
+  const url = new URL(request.url);
+  const id = Number(url.searchParams.get("id"));
+  if (!Number.isInteger(id) || id <= 0) return json({ ok: false, error: "bad-id" }, 400);
+
+  const me = await currentUser(request, env);
+  if (me?.id === id) {
+    return json(
+      { ok: false, error: "self-delete", message: "请到「账号」页注销自己的账号" },
+      400
+    );
+  }
+
+  const target = await env.DB.prepare(`SELECT id, role, status FROM users WHERE id = ?1`)
+    .bind(id)
+    .first<{ id: number; role: string; status: string }>();
+  if (!target) return json({ ok: false, error: "not-found" }, 404);
+
+  if (target.role === "admin") {
+    const admins = await env.DB.prepare(
+      `SELECT COUNT(*) AS n FROM users WHERE role = 'admin' AND status = 'active'`
+    ).first<{ n: number }>();
+    if ((admins?.n ?? 0) <= 1) {
+      return json(
+        { ok: false, error: "last-admin", message: "这是最后一个管理员，不能删除" },
+        400
+      );
+    }
+  }
+
+  await env.DB.prepare(`UPDATE comments SET user_id = NULL WHERE user_id = ?1`).bind(id).run();
+  await env.DB.prepare(`DELETE FROM sessions WHERE user_id = ?1`).bind(id).run();
+  await env.DB.prepare(`DELETE FROM users WHERE id = ?1`).bind(id).run();
+
+  return json({ ok: true, id, deleted: true });
+};

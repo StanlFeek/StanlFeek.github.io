@@ -91,6 +91,139 @@
     }
   }
 
+  /**
+   * 账号面板：改密码 + 注销账号。登录页（已登录状态）和后台「账号」页共用。
+   * host 是要塞进去的容器，opts.onDeleted 在注销成功后调用。
+   */
+  function accountBlocks(host, opts) {
+    opts = opts || {};
+
+    var pwCard = el("div", "auth-card");
+    pwCard.appendChild(el("p", "admin-note", "修改密码后，其他设备上的登录会立即失效。"));
+
+    function pwField(label, autocomplete) {
+      var wrap = el("label", "auth-field");
+      wrap.appendChild(el("span", "auth-label", label));
+      var input = el("input", "auth-input");
+      input.type = "password";
+      input.autocomplete = autocomplete;
+      wrap.appendChild(input);
+      return { wrap: wrap, input: input };
+    }
+
+    var f1 = pwField("当前密码", "current-password");
+    var f2 = pwField("新密码（至少 8 位）", "new-password");
+    var f3 = pwField("再输一次", "new-password");
+
+    var pwBtn = el("button", "auth-btn", "更新密码");
+    pwBtn.type = "button";
+    var pwMsg = el("p", "auth-status");
+
+    pwBtn.addEventListener("click", function () {
+      pwMsg.className = "auth-status";
+      pwMsg.textContent = "";
+      if (f2.input.value.length < 8) {
+        pwMsg.className = "auth-status bad";
+        pwMsg.textContent = "新密码至少 8 位";
+        return;
+      }
+      if (f2.input.value !== f3.input.value) {
+        pwMsg.className = "auth-status bad";
+        pwMsg.textContent = "两次输入的新密码不一样";
+        return;
+      }
+      pwBtn.disabled = true;
+      api("/auth/password", {
+        method: "POST",
+        body: { current: f1.input.value, next: f2.input.value },
+      })
+        .then(function (d) {
+          pwMsg.className = "auth-status ok";
+          pwMsg.textContent = d.message || "密码已更新";
+          f1.input.value = "";
+          f2.input.value = "";
+          f3.input.value = "";
+        })
+        .catch(function (e) {
+          pwMsg.className = "auth-status bad";
+          pwMsg.textContent = e.message;
+        })
+        .then(function () {
+          pwBtn.disabled = false;
+        });
+    });
+
+    pwCard.appendChild(f1.wrap);
+    pwCard.appendChild(f2.wrap);
+    pwCard.appendChild(f3.wrap);
+    pwCard.appendChild(pwBtn);
+    pwCard.appendChild(pwMsg);
+    host.appendChild(pwCard);
+
+    /* 注销账号 */
+    var delCard = el("div", "auth-card danger-zone");
+    delCard.appendChild(el("h3", "danger-title", "注销账号"));
+    delCard.appendChild(
+      el(
+        "p",
+        "admin-note",
+        "账号会被永久删除，无法恢复。你发过的留言会保留，但不再显示「已验证」标记。"
+      )
+    );
+
+    var d1 = pwField("输入当前密码确认", "current-password");
+    delCard.appendChild(d1.wrap);
+
+    var delBtn = el("button", "auth-btn danger", "永久注销账号");
+    delBtn.type = "button";
+    var delMsg = el("p", "auth-status");
+
+    var armed = false;
+    delBtn.addEventListener("click", function () {
+      delMsg.className = "auth-status";
+      delMsg.textContent = "";
+      if (!d1.input.value) {
+        delMsg.className = "auth-status bad";
+        delMsg.textContent = "请输入当前密码";
+        return;
+      }
+      if (!armed) {
+        armed = true;
+        delBtn.textContent = "再点一次确认注销";
+        delBtn.classList.add("armed");
+        return;
+      }
+      delBtn.disabled = true;
+      api("/auth/delete", { method: "POST", body: { password: d1.input.value } })
+        .then(function (d) {
+          window.STANL_USER = null;
+          delMsg.className = "auth-status ok";
+          delMsg.textContent = d.message || "账号已注销";
+          if (opts.onDeleted) {
+            opts.onDeleted();
+          } else {
+            setTimeout(function () {
+              location.href = "/";
+            }, 1200);
+          }
+        })
+        .catch(function (e) {
+          armed = false;
+          delBtn.textContent = "永久注销账号";
+          delBtn.classList.remove("armed");
+          delBtn.disabled = false;
+          delMsg.className = "auth-status bad";
+          delMsg.textContent = e.message;
+        });
+    });
+
+    delCard.appendChild(delBtn);
+    delCard.appendChild(delMsg);
+    host.appendChild(delCard);
+
+    return pwMsg;
+  }
+
   /* ── 登录 / 注册 ────────────────────────────────────── */
   function authPage(root) {
     root.textContent = "";
@@ -119,6 +252,7 @@
       row.appendChild(out);
       card.appendChild(row);
       root.appendChild(card);
+      accountBlocks(root);
       return;
     }
 
@@ -488,77 +622,13 @@
 
     function renderAccount() {
       panel.textContent = "";
-
-      var card = el("div", "auth-card");
-      var head = el("p", "admin-note");
-      head.textContent = "修改密码后，其他设备上的登录会立即失效。";
-      card.appendChild(head);
-
-      var f1 = el("label", "auth-field");
-      f1.appendChild(el("span", null, "当前密码"));
-      var i1 = el("input", "auth-input");
-      i1.type = "password";
-      i1.autocomplete = "current-password";
-      f1.appendChild(i1);
-
-      var f2 = el("label", "auth-field");
-      f2.appendChild(el("span", null, "新密码（至少 8 位）"));
-      var i2 = el("input", "auth-input");
-      i2.type = "password";
-      i2.autocomplete = "new-password";
-      f2.appendChild(i2);
-
-      var f3 = el("label", "auth-field");
-      f3.appendChild(el("span", null, "再输一次"));
-      var i3 = el("input", "auth-input");
-      i3.type = "password";
-      i3.autocomplete = "new-password";
-      f3.appendChild(i3);
-
-      var submit = el("button", "auth-btn", "更新密码");
-      submit.type = "button";
-      var msg = el("p", "auth-status");
-
-      submit.addEventListener("click", function () {
-        msg.className = "auth-status";
-        msg.textContent = "";
-        if (i2.value.length < 8) {
-          msg.className = "auth-status bad";
-          msg.textContent = "新密码至少 8 位";
-          return;
-        }
-        if (i2.value !== i3.value) {
-          msg.className = "auth-status bad";
-          msg.textContent = "两次输入的新密码不一样";
-          return;
-        }
-        submit.disabled = true;
-        api("/auth/password", {
-          method: "POST",
-          body: { current: i1.value, next: i2.value },
-        })
-          .then(function (d) {
-            msg.className = "auth-status ok";
-            msg.textContent = d.message || "密码已更新";
-            i1.value = "";
-            i2.value = "";
-            i3.value = "";
-          })
-          .catch(function (e) {
-            msg.className = "auth-status bad";
-            msg.textContent = e.message;
-          })
-          .then(function () {
-            submit.disabled = false;
-          });
+      accountBlocks(panel, {
+        onDeleted: function () {
+          setTimeout(function () {
+            location.href = "/";
+          }, 1200);
+        },
       });
-
-      card.appendChild(f1);
-      card.appendChild(f2);
-      card.appendChild(f3);
-      card.appendChild(submit);
-      card.appendChild(msg);
-      panel.appendChild(card);
 
       // 顺手给个退出登录的入口，改完密码不用再翻导航
       var out = el("button", "auth-btn ghost small", "退出登录");
@@ -599,6 +669,7 @@
                 else
                   ops.appendChild(btn("降为普通", "", function () { setUser(row.id, { role: "user" }); }));
                 ops.appendChild(btn("重置密码", "", function () { resetPassword(row); }));
+                ops.appendChild(btn("注销", "danger", function () { deleteUser(row); }));
               }
               tr.appendChild(ops);
               return tr;
@@ -620,6 +691,25 @@
       api("/admin/users", { method: "PATCH", body: { id: row.id, password: next } })
         .then(function () {
           status.textContent = "已重置 " + row.nickname + " 的密码，对方需要重新登录";
+        })
+        .catch(function (e) {
+          status.textContent = e.message;
+        });
+    }
+
+    function deleteUser(row) {
+      if (
+        !window.confirm(
+          "永久删除 " + row.nickname + "（" + row.email + "）的账号？\n" +
+            "账号无法恢复，其留言会保留但不再带「已验证」标记。"
+        )
+      )
+        return;
+      api("/admin/users?id=" + row.id, { method: "DELETE" })
+        .then(function () {
+          status.textContent = "已删除 " + row.nickname;
+          renderUsers();
+          loadStats();
         })
         .catch(function (e) {
           status.textContent = e.message;
