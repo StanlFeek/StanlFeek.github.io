@@ -28,3 +28,4 @@ id = "0fc9d21e320f4858b50991b9a6656a79"
 
 [vars]
 SITE_NAME = "stanl.top"
+MAIL_FROM = "StanlFeek 博客 <noreply@mail.stanl.top>"

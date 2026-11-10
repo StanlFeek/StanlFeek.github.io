@@ -214,7 +214,7 @@ export async function sendMail(
       method: "POST",
       headers: { authorization: `Bearer ${key}`, "content-type": "application/json" },
       body: JSON.stringify({
-        from: env.MAIL_FROM ?? "stanl.top <noreply@stanl.top>",
+        from: env.MAIL_FROM ?? "StanlFeek 博客 <noreply@mail.stanl.top>",
         to: [to],
         subject,
         html,
