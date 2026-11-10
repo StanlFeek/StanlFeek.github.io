@@ -20,10 +20,11 @@ stanl.top 从 GitHub Pages 迁到 Cloudflare Pages + Functions + D1 + R2 + KV �
 | 自定义域 stanl.top + www.stanl.top | ✅ 均 active，证书已签 |
 | www → apex 301 | ✅ 由 `functions/_middleware.ts` 实现 |
 | `_headers` 缓存与安全头 | ✅ 已生效 |
+| 推送到 main 自动部署 | ✅ `Deploy to Cloudflare Pages` 已跑通（secrets 已写入） |
+| 泰拉瑞亚游戏并入 `static/` | ✅ `/terraria/` 入口与 `/terraria-deepseek-v4.1-flash/` 均可访问 |
 | R2 `stanl-images` | ⛔ 按决定不启用（账号未绑支付方式，站点不用相册） |
-| GitHub 自动部署 | ⛔ 需要 token 或 Dashboard 连仓库 |
 
-**线上站点：https://stanl.top**（www 会 301 跳到它）—— 留言、友链、浏览量、搜索全部实测可用。
+**线上站点：https://stanl.top**（www 会 301 跳到它）—— 留言、友链、浏览量、搜索、`/terraria/` 全部实测可用。
 
 资源清单（已写入 `wrangler.toml`）：
 
@@ -169,17 +170,21 @@ npx wrangler pages deploy public --project-name stanl-top --branch main
   - Build output directory: `public`
   - 环境变量 `HUGO_VERSION=0.146.0`
 
-- **方式 B：GitHub Actions 推送**
-  已在 `.github/workflows/deploy-cloudflare.yml` 写好。需要在仓库 Settings → Secrets 添加：
-  - `CLOUDFLARE_API_TOKEN`（My Profile → API Tokens → 模板「Edit Cloudflare Workers」，额外给 Pages:Edit 与 D1:Edit）
-  - `CLOUDFLARE_ACCOUNT_ID`（Dashboard 右下角 / `wrangler whoami` 里）
+- **方式 B：GitHub Actions 推送（已启用 ✅）**
+  `.github/workflows/deploy-cloudflare.yml` 已在跑。仓库 Secrets 里已写入：
+  - `CLOUDFLARE_API_TOKEN`：token 名 `stanl-pages-deploy`，权限 `Cloudflare Pages: Edit`（所有账户），无过期
+  - `CLOUDFLARE_ACCOUNT_ID`：`386b3ee60a609e0024130e0d720daecf`
 
-> **状态：未配置。** 目前发布靠本地 `npm run deploy`。
-> 已有的 `stanl-migrate` token 只有 DNS:Edit + Zone:Edit，不能部署 Pages，别拿它填这个 secret。
-> 要开自动部署，按方式 A 点一遍最快；或另建一个带 `Cloudflare Pages:Edit` 的 token 走方式 B。
+  实测：push 到 main 后约 1 分钟完成构建 + 部署，`50b6e6c` 起全部 success。
+  本地仍可 `npm run deploy` 手动发版（两者不冲突，后跑的覆盖）。
 
-> 过渡期两个 workflow 会同时跑（GH Pages 一份、CF 一份），切完主域后再删 `.github/workflows/deploy.yml`。
-> 当前主域已切到 CF，但 GH Pages 仍在线，作为回滚路径保留。
+> 两个 workflow 目前都在跑：`Deploy Hugo site to Pages`（GitHub Pages，回滚路径）与
+> `Deploy to Cloudflare Pages`（生产）。等确认稳定后再删前者：`.github/workflows/deploy.yml`。
+
+> 令牌清单（都在本机，均已 gitignore）：
+> - `.cf-token.txt` — `stanl-migrate`，DNS:Edit + Zone:Edit（改 DNS 用）
+> - `.cf-pages-token.txt` — `stanl-pages-deploy`，Cloudflare Pages:Edit（CI 用）
+> - `.admin-token.txt` — `/api/comments/*` 删改与 `/api/upload` 的 Bearer 令牌
 
 ---
 
@@ -292,6 +297,16 @@ DNS 层面（5 分钟内可完成）：
 2. 重新加 4 条 A → `185.199.108.153`、`185.199.109.153`、`185.199.110.153`、`185.199.111.153`
 3. 重新加 CNAME `www` → `stanlfeek.github.io`
 4. GitHub 仓库 Settings → Pages → Custom domain 填回 `stanl.top`，勾选 Enforce HTTPS
+
+> 更快的应急路径：Cloudflare → stanl.top → DNS，把 `stanl.top` 那条 CNAME 的橙云关掉（改灰云）
+> 会立刻回源到 `stanl-top.pages.dev`，但页面仍由 Pages 提供；真正回 GH Pages 要走上面 4 步。
+
+## 5.1 遗留待办（不影响线上）
+
+- `.github/workflows/deploy.yml`（GitHub Pages）仍在跑，属回滚保险。稳定后可删。
+- 游戏 `terraria-deepseek-v4.1-flash` 的源码仓库仍在 GitHub（`StanlFeek/terraria-deepseek-v4.1-flash`），
+  博客里现在放的是它的构建副本（`static/terraria-deepseek-v4.1-flash/`）。
+  以后游戏更新要重新拷一份过去，或改成 submodule / 构建时拉取。
 
 代码层面：
 
