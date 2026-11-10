@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <meta name="theme-color" content="#0a0c12">
+  <title>泰拉瑞亚 — 无尽深渊的世界</title>
+  <link rel="icon" href="https://q1.qlogo.cn/g?b=qq&nk=2141077688&s=140" id="qq-favicon">
+  <link rel="apple-touch-icon" sizes="640x640" href="https://q1.qlogo.cn/g?b=qq&nk=2141077688&s=640" id="qq-touch-icon">
+  <script>
+    (() => {
+      // 图标直接用 QQ 头像。qlogo 的 Cache-Control 是 30 天，
+      // 所以把缓存键按小时滚动：换头像后最迟下一个整点自动生效。
+      const QQ = '2141077688';
+      const v = Math.floor(Date.now() / 36e5);
+      const url = (s) => 'https://q1.qlogo.cn/g?b=qq&nk=' + QQ + '&s=' + s + '&v=' + v;
+      const fav = document.getElementById('qq-favicon');
+      const touch = document.getElementById('qq-touch-icon');
+      if (fav) fav.href = url(140);
+      if (touch) touch.href = url(640);
+    })();
+  </script>
+  <link rel="stylesheet" href="style.css?v=20261018a">
+</head>
+<body>
+  <div id="stage">
+    <canvas id="game" width="960" height="540" aria-label="泰拉瑞亚冒险游戏"></canvas>
+    <div id="scanlines"></div>
+    <div id="vignette"></div>
+  </div>
+  <div id="boot">
+    <div class="boot-inner">
+      <div class="boot-logo">泰拉瑞亚</div>
+      <div class="boot-sub">无尽深渊的世界</div>
+      <div class="boot-bar"><i></i></div>
+      <div class="boot-tip">挖掘、建造，以及深渊之下的秘密。</div>
+    </div>
+  </div>
+  <div id="fatal"></div>
+
+  <script src="src/util.js?v=20261018a"></script>
+  <script src="src/lang.js?v=20261018a"></script>
+  <script src="src/data.js?v=20261018a"></script>
+  <script src="src/sprites.js?v=20261018a"></script>
+  <script src="src/audio.js?v=20261018a"></script>
+  <script src="src/world.js?v=20261018a"></script>
+  <script src="src/entities.js?v=20261018a"></script>
+  <script src="src/ui.js?v=20261018a"></script>
+  <script src="src/game.js?v=20261018a"></script>
+</body>
+</html>

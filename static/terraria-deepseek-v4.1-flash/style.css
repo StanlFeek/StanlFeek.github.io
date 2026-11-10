@@ -1,0 +1,172 @@
+@font-face {
+  font-family: 'Press Start 2P';
+  src: url('assets/press-start-2p.woff2') format('woff2');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --gold: #d9bd7f;
+  --ink: #07080d;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #05060a;
+  color: #e8dfc8;
+  font-family: 'Press Start 2P', 'Microsoft YaHei UI', 'Microsoft YaHei', '微软雅黑', 'Courier New', monospace;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: none;
+}
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(ellipse at 50% 30%, rgba(52, 64, 98, .22), transparent 58%),
+    repeating-linear-gradient(0deg, #05060a 0 3px, #070810 3px 6px);
+}
+
+#stage {
+  position: relative;
+  line-height: 0;
+  background: #000;
+  box-shadow:
+    0 0 0 2px #1a1c28,
+    0 0 0 4px #05060a,
+    0 18px 70px rgba(0, 0, 0, .8),
+    0 0 120px rgba(56, 86, 138, .12);
+  filter: saturate(1.06) contrast(1.02);
+}
+
+#game {
+  display: block;
+  image-rendering: pixelated;
+  image-rendering: crisp-edges;
+  cursor: default;
+  background: #0a0c13;
+  width: 960px;
+  height: 540px;
+}
+
+#scanlines {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, .12) 0px,
+    rgba(0, 0, 0, .12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: multiply;
+  opacity: .08;
+}
+
+#vignette {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, transparent 52%, rgba(0, 0, 0, .34) 100%);
+}
+
+#boot {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #05060a;
+  z-index: 30;
+  transition: opacity .4s ease;
+}
+
+#boot.hidden { opacity: 0; pointer-events: none; }
+
+.boot-inner {
+  text-align: center;
+  padding: 28px 42px;
+  border: 2px solid #262a38;
+  background: linear-gradient(180deg, rgba(16, 18, 27, .96), rgba(8, 9, 14, .98));
+  box-shadow: 0 0 0 4px #080910, 0 18px 50px rgba(0, 0, 0, .8);
+}
+
+.boot-logo {
+  font-family: 'Microsoft YaHei UI', 'Microsoft YaHei', '微软雅黑', 'Press Start 2P', sans-serif;
+  font-size: 38px;
+  font-weight: 700;
+  color: #edcf86;
+  letter-spacing: 6px;
+  text-shadow: 0 4px 0 #6b4b1e, 0 7px 0 #2a1b0c, 0 0 24px rgba(240, 198, 110, .3);
+}
+
+.boot-sub {
+  font-family: 'Microsoft YaHei UI', 'Microsoft YaHei', '微软雅黑', sans-serif;
+  font-size: 13px;
+  color: #9aa3b8;
+  letter-spacing: 3px;
+  margin-top: 18px;
+}
+
+.boot-bar {
+  width: 280px;
+  height: 8px;
+  margin: 26px auto 12px;
+  border: 1px solid #3a3f52;
+  padding: 1px;
+  background: #0a0b10;
+}
+
+.boot-bar i {
+  display: block;
+  height: 100%;
+  width: 40%;
+  background: linear-gradient(90deg, #7a6136, #e1c381);
+  animation: bootbar 1.3s ease-in-out infinite;
+}
+
+@keyframes bootbar {
+  0% { width: 6%; margin-left: 0; }
+  50% { width: 68%; margin-left: 12%; }
+  100% { width: 6%; margin-left: 90%; }
+}
+
+.boot-tip {
+  font-family: 'Microsoft YaHei UI', 'Microsoft YaHei', '微软雅黑', sans-serif;
+  font-size: 12px;
+  color: #666f83;
+  margin-top: 16px;
+  letter-spacing: .5px;
+}
+
+#fatal {
+  display: none;
+  position: fixed;
+  left: 12px;
+  right: 12px;
+  bottom: 12px;
+  max-height: 42vh;
+  overflow: auto;
+  z-index: 40;
+  padding: 12px;
+  font-size: 7px;
+  line-height: 1.7;
+  color: #ffb0a0;
+  background: rgba(24, 8, 8, .96);
+  border: 1px solid #7a2d2d;
+  white-space: pre-wrap;
+}
+
+@media (max-height: 560px) {
+  #scanlines { opacity: .05; }
+}
