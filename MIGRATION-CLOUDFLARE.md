@@ -3,6 +3,35 @@
 stanl.top 从 GitHub Pages 迁到 Cloudflare Pages + Functions + D1 + R2 + KV 的执行手册。
 每一步都可用命令复核，「状态」列打勾表示已完成。
 
+## 当前进度（2026-11-10）
+
+| 项目 | 状态 |
+| --- | --- |
+| 仓库/工作区备份 + tag | ✅ |
+| 本地 Hugo 0.146.0 extended 构建通过 | ✅ |
+| Functions（8 个接口）TypeScript 语法检查 | ✅ |
+| Cloudflare 账号授权（wrangler OAuth） | ✅ |
+| D1 `stanl-blog` + 三张表 | ✅ |
+| KV `stanl-top-KV` | ✅ |
+| Pages 项目 `stanl-top` | ✅ |
+| `ADMIN_TOKEN` secret | ✅ |
+| 首次部署 + 全接口烟测 | ✅ https://stanl-top.pages.dev |
+| R2 `stanl-images` | ⛔ 账号未开通 R2（需绑支付方式） |
+| 自定义域 stanl.top | ⛔ 域名 NS 在 DNSPod，需先迁到 Cloudflare |
+| GitHub 自动部署 | ⛔ 需要 token 或 Dashboard 连仓库 |
+
+**站点已可访问：https://stanl-top.pages.dev** —— 留言、友链、浏览量全部实测可用。
+
+资源清单（已写入 `wrangler.toml`）：
+
+```
+account id   : 386b3ee60a609e0024130e0d720daecf
+D1 database  : stanl-blog  → 883054b0-9b04-41a9-9d8f-05ddeeb027d8  (WNAM)
+KV namespace : stanl-top-KV → 0fc9d21e320f4858b50991b9a6656a79
+Pages project: stanl-top
+R2 bucket    : stanl-images（未创建）
+```
+
 ---
 
 ## 0. 备份（已完成）
@@ -39,7 +68,7 @@ git clone repo-all.bundle restored-site
 
 ---
 
-## 2. Cloudflare 侧资源
+## 2. Cloudflare 侧资源（已完成）
 
 按顺序执行，每条都会打印 id，填回 `wrangler.toml`。
 
@@ -63,21 +92,17 @@ npx wrangler kv namespace create KV
 #   → 输出 id = xxxxxxxxxxxxxxxxxxxx
 ```
 
-把三个 id 填进 `wrangler.toml`，并去掉对应块的注释：
+把三个 id 填进 `wrangler.toml`，并去掉对应块的注释：（已填好，见上）
 
 ```toml
 [[d1_databases]]
 binding = "DB"
 database_name = "stanl-blog"
-database_id = "填这里"
-
-[[r2_buckets]]
-binding = "R2"
-bucket_name = "stanl-images"
+database_id = "883054b0-9b04-41a9-9d8f-05ddeeb027d8"
 
 [[kv_namespaces]]
 binding = "KV"
-id = "填这里"
+id = "0fc9d21e320f4858b50991b9a6656a79"
 ```
 
 建表：
@@ -144,15 +169,33 @@ dig +short NS stanl.top
 5. 到 GitHub 仓库 Settings → Pages，把 Custom domain 清空（否则证书校验打架）
 6. 代理状态必须是**橙云**（DNS only 会让证书签不下来）
 
-**NS 不在 Cloudflare** —— 先 `Add a site` 把 stanl.top 加进 CF 并改 NS。迁之前逐条核对：
+**NS 不在 Cloudflare（当前就是这种情况）**
 
-```bash
-dig +short MX stanl.top
-dig +short TXT stanl.top        # SPF / 验证记录
-dig +short CAA stanl.top
+实测 2026-11-10：
+
+```
+NS      : pineapple.dnspod.net / if.dnspod.net   ← 在 DNSPod，不在 Cloudflare
+A       : 185.199.108.153 / 185.199.109.153     ← GitHub Pages
+www     : CNAME stanlfeek.github.io
+MX      : 无
+TXT     : 无（也没有 _dmarc）
+CAA     : 无
 ```
 
-MX、TXT、CAA 必须有对应记录搬过去 —— 漏一条就是邮件收不到或证书签不出。
+意味着：**这次迁移没有任何邮件记录会断**，只需要搬 4 条 A + 1 条 CNAME，风险最低。
+
+步骤：
+
+1. Cloudflare 控制台 → Add a site → `stanl.top` → 选 Free
+2. CF 会自动扫出上面这几条记录，核对一遍（尤其别让 www 的 CNAME 丢）
+3. CF 给出两个专属 NS，例如 `xxx.ns.cloudflare.com`
+4. 到 DNSPod 的域名管理里，把 NS 改成这两个（这一步必须你自己操作，需要 DNSPod 账号）
+5. 等 Zone 状态从 pending 变 active（通常 1–24 小时）
+6. 回来执行第 4 节的「绑定域名」
+
+> 注意：Cloudflare Pages 的自定义域要求域名托管在 Cloudflare（免费版不支持外部 DNS 的 CNAME 接入）。
+> 所以在 NS 迁完之前，stanl.top 无法指向 Pages，只能先用 `stanl-top.pages.dev`。
+
 
 ### 切换顺序（避免空窗）
 

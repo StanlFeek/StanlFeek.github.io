@@ -25,6 +25,10 @@
       {{- partial "translation_list.html" . -}}
       {{- partial "edit_post.html" . -}}
       {{- partial "post_canonical.html" . -}}
+      {{- /* 浏览量：只在单篇页渲染，由 /api/view 异步填充，避免列表卡片自增 */ -}}
+      {{- if and (eq .Kind "page") (default true site.Params.enablePageViews) }}
+      <span class="meta-sep">&nbsp;·&nbsp;</span><span data-pageviews data-path="{{ .RelPermalink }}">— 次浏览</span>
+      {{- end }}
     </div>
     {{- end }}
   </header>
