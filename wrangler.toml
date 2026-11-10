@@ -17,11 +17,11 @@ database_id = "883054b0-9b04-41a9-9d8f-05ddeeb027d8"
 binding = "KV"
 id = "0fc9d21e320f4858b50991b9a6656a79"
 
-# ── R2（图片 / 相册）──────────────────────────────────────────
-# 当前账号尚未开通 R2（需在控制台 R2 → 开通，绑支付方式）。
-# 开通后执行 `npx wrangler r2 bucket create stanl-images`，再取消下面三行注释，
-# 然后到 R2 → stanl-images → Settings → Custom Domains 添加 img.stanl.top。
-# 未开通时 /api/health 会把 r2 标为 disabled，/api/upload 与 /api/photos 返回 503。
+# ── R2（图片 / 相册）── 已决定不启用 ───────────────────────────
+# 2026-11-10：明确不做相册，R2 不开通（不必绑支付方式）。
+# 因此 /api/upload 与 /api/photos 固定返回 503，/api/health 里 r2 为 disabled。
+# 将来若要相册：控制台 R2 → 开通 → `npx wrangler r2 bucket create stanl-images`
+# → 取消下面三行注释 → R2 → stanl-images → Settings → Custom Domains 加 img.stanl.top。
 # [[r2_buckets]]
 # binding = "R2"
 # bucket_name = "stanl-images"

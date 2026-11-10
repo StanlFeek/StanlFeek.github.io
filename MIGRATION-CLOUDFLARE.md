@@ -16,21 +16,50 @@ stanl.top 从 GitHub Pages 迁到 Cloudflare Pages + Functions + D1 + R2 + KV �
 | Pages 项目 `stanl-top` | ✅ |
 | `ADMIN_TOKEN` secret | ✅ |
 | 首次部署 + 全接口烟测 | ✅ https://stanl-top.pages.dev |
-| R2 `stanl-images` | ⛔ 账号未开通 R2（需绑支付方式） |
-| 自定义域 stanl.top | ⛔ 域名 NS 在 DNSPod，需先迁到 Cloudflare |
+| NS 迁到 Cloudflare（gemma/sonny） | ✅ zone `stanl.top` 已 active |
+| 自定义域 stanl.top + www.stanl.top | ✅ 均 active，证书已签 |
+| www → apex 301 | ✅ 由 `functions/_middleware.ts` 实现 |
+| `_headers` 缓存与安全头 | ✅ 已生效 |
+| R2 `stanl-images` | ⛔ 按决定不启用（账号未绑支付方式，站点不用相册） |
 | GitHub 自动部署 | ⛔ 需要 token 或 Dashboard 连仓库 |
 
-**站点已可访问：https://stanl-top.pages.dev** —— 留言、友链、浏览量全部实测可用。
+**线上站点：https://stanl.top**（www 会 301 跳到它）—— 留言、友链、浏览量、搜索全部实测可用。
 
 资源清单（已写入 `wrangler.toml`）：
 
 ```
 account id   : 386b3ee60a609e0024130e0d720daecf
+zone id      : b51ac8973e5c00f0933937e60e707d82   (stanl.top)
+zone NS      : gemma.ns.cloudflare.com / sonny.ns.cloudflare.com
 D1 database  : stanl-blog  → 883054b0-9b04-41a9-9d8f-05ddeeb027d8  (WNAM)
 KV namespace : stanl-top-KV → 0fc9d21e320f4858b50991b9a6656a79
 Pages project: stanl-top
-R2 bucket    : stanl-images（未创建）
+R2 bucket    : 未启用
 ```
+
+### DNS 最终状态（2026-11-10 18:35）
+
+| 名称 | 类型 | 内容 | 代理 |
+| --- | --- | --- | --- |
+| `stanl.top` | CNAME | `stanl-top.pages.dev` | 橙云 |
+| `www.stanl.top` | CNAME | `stanl-top.pages.dev` | 橙云 |
+
+原 DNSPod 的两条 GitHub Pages A 记录（185.199.108.153 / 185.199.109.153）与 `www → stanlfeek.github.io` 的 CNAME 已删除/改写。
+迁移前该域名**没有 MX / TXT / CAA / _dmarc**，所以 NS 切换没有邮件或验证记录要保留。
+
+证书（Universal SSL，自动续期）：
+
+```
+stanl.top      CN=stanl.top      issuer=Google Trust Services WE1   notAfter 2027-02-08
+www.stanl.top  CN=www.stanl.top  issuer=Let's Encrypt YE2           notAfter 2027-02-08
+```
+
+### 两个绕不开的平台行为（实测结论，别再踩）
+
+1. **`_redirects` 不处理跨域名规则**。写 `https://www.stanl.top/* https://stanl.top/:splat 301!` 在两个自定义域都 active 之后仍然不生效，路径规则（如 `/a /b 302`）则正常。所以 www→apex 改由根级 `functions/_middleware.ts` 做 host 判断后 `Response.redirect(..., 301)`。
+2. **`_redirects` 的 splat 只能整段**。`/posts/*.html → /posts/:splat` 这类「段内通配」不匹配，别写。
+
+zone 级 Redirect Rule（Rulesets API）也可行，但 `stanl-migrate` token 只有 DNS:Edit + Zone:Edit，调 `/zones/{id}/rulesets` 直接 `Authentication error`，所以没走这条路。
 
 ---
 
@@ -145,7 +174,12 @@ npx wrangler pages deploy public --project-name stanl-top --branch main
   - `CLOUDFLARE_API_TOKEN`（My Profile → API Tokens → 模板「Edit Cloudflare Workers」，额外给 Pages:Edit 与 D1:Edit）
   - `CLOUDFLARE_ACCOUNT_ID`（Dashboard 右下角 / `wrangler whoami` 里）
 
+> **状态：未配置。** 目前发布靠本地 `npm run deploy`。
+> 已有的 `stanl-migrate` token 只有 DNS:Edit + Zone:Edit，不能部署 Pages，别拿它填这个 secret。
+> 要开自动部署，按方式 A 点一遍最快；或另建一个带 `Cloudflare Pages:Edit` 的 token 走方式 B。
+
 > 过渡期两个 workflow 会同时跑（GH Pages 一份、CF 一份），切完主域后再删 `.github/workflows/deploy.yml`。
+> 当前主域已切到 CF，但 GH Pages 仍在线，作为回滚路径保留。
 
 ---
 
@@ -169,32 +203,42 @@ dig +short NS stanl.top
 5. 到 GitHub 仓库 Settings → Pages，把 Custom domain 清空（否则证书校验打架）
 6. 代理状态必须是**橙云**（DNS only 会让证书签不下来）
 
-**NS 不在 Cloudflare（当前就是这种情况）**
-
-实测 2026-11-10：
+**NS 已迁到 Cloudflare，且已全部切完（2026-11-10 18:35 完成）**
 
 ```
-NS      : pineapple.dnspod.net / if.dnspod.net   ← 在 DNSPod，不在 Cloudflare
-A       : 185.199.108.153 / 185.199.109.153     ← GitHub Pages
-www     : CNAME stanlfeek.github.io
-MX      : 无
-TXT     : 无（也没有 _dmarc）
-CAA     : 无
+Zone  : stanl.top  id=b51ac8973e5c00f0933937e60e707d82
+NS    : gemma.ns.cloudflare.com / sonny.ns.cloudflare.com
+状态  : active
 ```
 
-意味着：**这次迁移没有任何邮件记录会断**，只需要搬 4 条 A + 1 条 CNAME，风险最低。
+实际执行的 DNS 变更（已用 DNS:Edit token 走 API 完成，不是手点）：
 
-步骤：
+| 操作 | 类型 | 名称 | 内容 | 代理 | 结果 |
+| --- | --- | --- | --- | --- | --- |
+| 删 | A | `@` | `185.199.108.153` | — | ✅ |
+| 删 | A | `@` | `185.199.109.153` | — | ✅ |
+| 加 | CNAME | `@` | `stanl-top.pages.dev` | 橙云 | ✅ flattening |
+| 改 | CNAME | `www` | `stanl-top.pages.dev` | 橙云 | ✅（原指向 `stanlfeek.github.io`） |
 
-1. Cloudflare 控制台 → Add a site → `stanl.top` → 选 Free
-2. CF 会自动扫出上面这几条记录，核对一遍（尤其别让 www 的 CNAME 丢）
-3. CF 给出两个专属 NS，例如 `xxx.ns.cloudflare.com`
-4. 到 DNSPod 的域名管理里，把 NS 改成这两个（这一步必须你自己操作，需要 DNSPod 账号）
-5. 等 Zone 状态从 pending 变 active（通常 1–24 小时）
-6. 回来执行第 4 节的「绑定域名」
+> apex 用 CNAME 依赖 Cloudflare 的 flattening，必须先删干净 A/AAAA 才不冲突。
+> Pages → Custom domains 里两个域现在都是 `active`，证书已签发。
 
-> 注意：Cloudflare Pages 的自定义域要求域名托管在 Cloudflare（免费版不支持外部 DNS 的 CNAME 接入）。
-> 所以在 NS 迁完之前，stanl.top 无法指向 Pages，只能先用 `stanl-top.pages.dev`。
+**拥有 `dns:write` 的 API Token 时，上面这些可以一条命令做完：**
+
+```bash
+ACC=386b3ee60a609e0024130e0d720daecf
+ZID=b51ac8973e5c00f0933937e60e707d82
+H="Authorization: Bearer $CF_API_TOKEN"
+
+# 1) 列出并删掉所有 @ 的 A/AAAA
+curl -s "https://api.cloudflare.com/client/v4/zones/$ZID/dns_records?type=A&name=stanl.top" -H "$H" \
+  | jq -r '.result[].id' | xargs -I{} curl -s -X DELETE "https://api.cloudflare.com/client/v4/zones/$ZID/dns_records/{}" -H "$H"
+
+# 2) 建 apex CNAME + 改 www
+curl -s -X POST "https://api.cloudflare.com/client/v4/zones/$ZID/dns_records" -H "$H" \
+  -H 'content-type: application/json' \
+  -d '{"type":"CNAME","name":"stanl.top","content":"stanl-top.pages.dev","proxied":true}'
+```
 
 
 ### 切换顺序（避免空窗）
@@ -209,26 +253,34 @@ CAA     : 无
 ⑦ TTL 调回 Auto
 ```
 
-### 验证
+### 验证（以下为 2026-11-10 实测结果）
 
 ```bash
 curl -sI https://stanl.top | grep -iE 'server|cf-ray'
-# 期望：server: cloudflare，有 cf-ray
+# 实测：server: cloudflare，带 cf-ray（HKG / LAX 边缘）
 
 openssl s_client -connect stanl.top:443 -servername stanl.top </dev/null 2>/dev/null | openssl x509 -noout -issuer -dates
-# 期望：issuer 含 Google Trust Services / Let's Encrypt，未过期
+# 实测：CN=stanl.top，issuer Google Trust Services WE1，notAfter 2027-02-08
+#       CN=www.stanl.top，issuer Let's Encrypt YE2，notAfter 2027-02-08
 
 curl -s https://stanl.top/api/health
-# 期望：{"ok":true,"checks":{"d1":true,"r2":true,"kv":true}}
+# 实测：{"site":"stanl.top","ok":true,"checks":{"d1":"ok","r2":"disabled","kv":"ok","admin_token":"set"}}
 
 curl -s -X POST https://stanl.top/api/view -H 'content-type: application/json' -d '{"path":"/__smoke__"}'
 # 期望：{"path":"/__smoke__","views":1,"counted":true}
+
+curl -sS -o /dev/null -w '%{http_code} %{redirect_url}\n' https://www.stanl.top/posts/
+# 期望：301 https://stanl.top/posts/
 ```
+
+注意：`Invoke-WebRequest -Method Head` 请求 Pages Function 会 404（没实现 `onRequestHead`），用 GET 或 `curl -sI`。
 
 ### 图片域名（R2）
 
-R2 → stanl-images → Settings → Custom Domains → 添加 `img.stanl.top`。
-同样要橙云，否则 R2 的自定义域不可用。
+**未启用。** R2 需要在 Cloudflare 账号绑定支付方式才能开通，当前按决定不做相册，
+`img.stanl.top` 不添加，`/api/upload` 与 `/api/photos` 固定返回 503。
+以后要开：R2 → 创建 `stanl-images` → Settings → Custom Domains 加 `img.stanl.top`（橙云），
+再把 `wrangler.toml` 里 R2 那段取消注释并填 `bucket_name`，两个接口改回真实实现。
 
 ---
 

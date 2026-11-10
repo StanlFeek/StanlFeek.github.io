@@ -1,9 +1,8 @@
 # Cloudflare Pages 重定向规则
 # 语法：<来源> <目标> [状态码]
-# 仅在域名绑定到 Pages 后生效。
-
-# www → 主域（301，SEO 归一，避免重复内容）
-https://www.stanl.top/*  https://stanl.top/:splat  301!
-
-# 旧式 .html 后缀的来访链接归一到干净 URL
-/posts/*.html  /posts/:splat  301!
+#
+# 注意：这里只放「同域名的路径规则」。
+# 跨域名（www → apex）的规则写在 functions/_middleware.ts 里，
+# 因为 Pages 的 _redirects 对绝对 URL 的 host 规则实测不生效。
+#
+# 站点目前不产出 .html 结尾的 URL，因此暂无必需规则，保留此文件作为扩展位。
