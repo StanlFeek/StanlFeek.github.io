@@ -37,7 +37,7 @@ html.intro-active,
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: var(--intro-background);
+    background: transparent;
     overflow: hidden;
     touch-action: none;
     user-select: none;

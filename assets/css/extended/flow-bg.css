@@ -1,0 +1,141 @@
+/* 全站流动渐变底色
+   做法：底色层挂在 html 的伪元素上（不占 body::before，那个位置被首屏占用），
+   body 自己只盖一层很淡的薄纱，卡片改成玻璃，正文照旧压在浅色面板上。 */
+
+:root {
+    --flow-base: #edf2fa;
+    --flow-1: rgba(120, 176, 240, 0.8);
+    --flow-2: rgba(104, 214, 198, 0.72);
+    --flow-3: rgba(176, 158, 240, 0.72);
+    --flow-4: rgba(246, 186, 122, 0.62);
+    --flow-5: rgba(244, 148, 172, 0.56);
+    --flow-veil: rgba(255, 255, 255, 0.4);
+    --glass: rgba(255, 255, 255, 0.68);
+}
+
+:root[data-theme="dark"] {
+    --flow-base: #06080d;
+    --flow-1: rgba(62, 122, 216, 0.8);
+    --flow-2: rgba(30, 160, 152, 0.72);
+    --flow-3: rgba(118, 98, 214, 0.72);
+    --flow-4: rgba(214, 134, 58, 0.58);
+    --flow-5: rgba(206, 66, 108, 0.5);
+    --flow-veil: rgba(4, 6, 10, 0.26);
+    --glass: rgba(22, 25, 32, 0.66);
+}
+
+html {
+    background-color: var(--flow-base);
+}
+
+/* body 上的 background 会被 .list / [data-theme] .list 抢走，这里直接钉死透明 */
+body {
+    min-height: 100vh;
+    background: transparent !important;
+}
+
+/* 薄纱：压在色彩层之上、正文之下 */
+body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    z-index: -1;
+    background: var(--flow-veil);
+    pointer-events: none;
+}
+
+/* 旋转的锥形色轮 */
+html::before {
+    content: "";
+    position: fixed;
+    inset: -45%;
+    z-index: -2;
+    background: conic-gradient(
+        from 0deg,
+        var(--flow-1),
+        var(--flow-2),
+        var(--flow-3),
+        var(--flow-4),
+        var(--flow-5),
+        var(--flow-1)
+    );
+    filter: blur(130px) saturate(140%);
+    opacity: 0.62;
+    animation: flow-spin 96s linear infinite;
+    pointer-events: none;
+    will-change: transform;
+}
+
+/* 五团慢速漂移的颜色 */
+html::after {
+    content: "";
+    position: fixed;
+    inset: -18%;
+    z-index: -2;
+    background:
+        radial-gradient(closest-side, var(--flow-1), transparent 72%) 12% 18% / 62% 66% no-repeat,
+        radial-gradient(closest-side, var(--flow-2), transparent 72%) 84% 26% / 58% 62% no-repeat,
+        radial-gradient(closest-side, var(--flow-3), transparent 74%) 22% 84% / 64% 66% no-repeat,
+        radial-gradient(closest-side, var(--flow-4), transparent 74%) 78% 88% / 52% 58% no-repeat,
+        radial-gradient(closest-side, var(--flow-5), transparent 76%) 48% 50% / 50% 56% no-repeat;
+    filter: blur(72px) saturate(145%);
+    animation: flow-drift 34s ease-in-out infinite alternate;
+    pointer-events: none;
+    will-change: transform;
+}
+
+@keyframes flow-drift {
+    from { transform: translate3d(-3%, -2%, 0) scale(1); }
+    50% { transform: translate3d(4%, 3%, 0) scale(1.1); }
+    to { transform: translate3d(-2%, 5%, 0) scale(0.95); }
+}
+
+@keyframes flow-spin {
+    from { transform: rotate(0deg) scale(1.05); }
+    to { transform: rotate(360deg) scale(1.05); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    html::before,
+    html::after {
+        animation: none !important;
+    }
+}
+
+/* 卡片、列表容器改成玻璃，让底色透出来 */
+:root {
+    --entry: var(--glass);
+}
+
+.list {
+    background-color: transparent;
+    background-image: none;
+}
+
+.post-entry,
+.paginav,
+.toc,
+.search-results .post-entry {
+    -webkit-backdrop-filter: blur(12px) saturate(140%);
+    backdrop-filter: blur(12px) saturate(140%);
+}
+
+/* 文章正文也放进一块玻璃里，长文阅读不费眼 */
+.post-single {
+    background: var(--glass);
+    border-radius: 18px;
+    padding: 22px 24px 18px;
+    -webkit-backdrop-filter: blur(16px) saturate(140%);
+    backdrop-filter: blur(16px) saturate(140%);
+}
+
+@media (max-width: 640px) {
+    .post-single {
+        padding: 16px 16px 12px;
+        border-radius: 14px;
+    }
+}
+
+.footer {
+    background-color: transparent;
+}
