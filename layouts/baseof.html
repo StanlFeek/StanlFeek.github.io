@@ -21,6 +21,7 @@
 {{- else }}
 <body id="top">
 {{- end }}
+    {{- partial "bgvideo.html" . }}
     {{- if .IsHome }}{{ partial "intro.html" . }}{{ end }}
     {{ partialCached "header.html" . .Page -}}
     <main class="main">

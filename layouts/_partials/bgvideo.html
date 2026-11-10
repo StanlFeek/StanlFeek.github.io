@@ -1,0 +1,30 @@
+<div class="site-bg" aria-hidden="true">
+    <video
+        id="site-bg-video"
+        class="site-bg-video"
+        autoplay
+        muted
+        loop
+        playsinline
+        preload="auto"
+        disablepictureinpicture
+        poster="{{ "media/kuroha-poster.jpg" | relURL }}">
+        <source src="{{ "media/kuroha-bg-720.mp4" | relURL }}" type="video/mp4">
+    </video>
+    <span class="site-bg-scrim"></span>
+</div>
+<script>
+    (function () {
+        var v = document.getElementById("site-bg-video");
+        if (!v) return;
+        var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        var saveData = navigator.connection && (navigator.connection.saveData || /2g/.test(navigator.connection.effectiveType || ""));
+        if (reduce || saveData) {
+            try { v.pause(); } catch (e) {}
+            v.removeAttribute("autoplay");
+            return;
+        }
+        var p = v.play();
+        if (p && p.catch) { p.catch(function () {}); }
+    })();
+</script>

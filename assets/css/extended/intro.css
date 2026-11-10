@@ -26,7 +26,7 @@ html.intro-active,
     position: fixed;
     inset: 0;
     z-index: 10000;
-    background: var(--intro-background);
+    background: transparent;
 }
 
 .site-intro[hidden] {
@@ -169,125 +169,29 @@ html.intro-active,
     animation: intro-appear 900ms 820ms both;
 }
 
-/* 卡后面的一层流动彩色：没有它就无从「透」起 */
-.intro-aura {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 103%;
-    height: 112%;
-    transform: translate(-50%, -50%);
-    border-radius: 20px;
-    overflow: hidden;
-    background: linear-gradient(120deg, #6fb3f2 0%, #7fd8d0 34%, #b3a6ee 66%, #f0b978 100%);
-    filter: blur(14px) saturate(155%);
-    opacity: 1;
-    pointer-events: none;
-}
-
-/* 旋转的锥形渐变：让颜色在卡片里慢慢流 */
-.intro-aura::before {
-    content: "";
-    position: absolute;
-    inset: -34%;
-    background: conic-gradient(
-        from 0deg,
-        rgba(96, 168, 240, 0.95),
-        rgba(126, 216, 206, 0.85),
-        rgba(178, 164, 238, 0.9),
-        rgba(244, 152, 168, 0.75),
-        rgba(244, 186, 112, 0.8),
-        rgba(96, 168, 240, 0.95)
-    );
-    animation: intro-drift-spin 26s linear infinite;
-}
-
-/* 第二层漂移光斑：叠加出层次 */
-.intro-aura::after {
-    content: "";
-    position: absolute;
-    inset: -30%;
-    background:
-        radial-gradient(closest-side, rgba(120, 210, 255, 0.9), rgba(120, 210, 255, 0) 72%) 18% 24% / 62% 82% no-repeat,
-        radial-gradient(closest-side, rgba(255, 214, 150, 0.8), rgba(255, 214, 150, 0) 72%) 76% 70% / 58% 78% no-repeat;
-    animation: intro-drift-a 18s ease-in-out infinite alternate;
-}
-
 .intro-quote {
     position: relative;
     z-index: 1;
     width: 100%;
     padding: 18px 22px 14px;
-    border: 1px solid rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.62);
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.06));
+    background: rgba(255, 255, 255, 0.46);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.95),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.3),
-        0 18px 44px -24px rgba(20, 26, 34, 0.55);
-    -webkit-backdrop-filter: blur(20px) saturate(185%);
-    backdrop-filter: blur(20px) saturate(185%);
+        inset 0 1px 0 rgba(255, 255, 255, 0.9),
+        0 16px 40px -22px rgba(12, 18, 26, 0.5);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
     text-align: left;
     pointer-events: auto;
-    overflow: hidden;
-}
-
-/* 斜向高光：液态玻璃的那道反光 */
-.intro-quote::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background: linear-gradient(
-        118deg,
-        rgba(255, 255, 255, 0.55) 0%,
-        rgba(255, 255, 255, 0.06) 26%,
-        rgba(255, 255, 255, 0) 58%,
-        rgba(255, 255, 255, 0.18) 82%,
-        rgba(255, 255, 255, 0.34) 100%
-    );
-    pointer-events: none;
-}
-
-:root[data-theme="dark"] .intro-aura {
-    filter: blur(14px) saturate(140%) brightness(0.46);
-}
-
-@keyframes intro-drift-spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
-
-@keyframes intro-drift-a {
-    from { transform: translate3d(-6%, -4%, 0) scale(1); }
-    50% { transform: translate3d(8%, 6%, 0) scale(1.14); }
-    to { transform: translate3d(-2%, 10%, 0) scale(0.94); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-    .intro-aura::before,
-    .intro-aura::after {
-        animation: none !important;
-    }
 }
 
 :root[data-theme="dark"] .intro-quote {
-    border-color: rgba(255, 255, 255, 0.2);
-    background: linear-gradient(135deg, rgba(10, 12, 16, 0.34), rgba(10, 12, 16, 0.12));
+    border-color: rgba(255, 255, 255, 0.16);
+    background: rgba(24, 27, 33, 0.52);
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 0 rgba(255, 255, 255, 0.06),
-        0 18px 44px -24px rgba(0, 0, 0, 0.85);
-}
-
-:root[data-theme="dark"] .intro-quote::after {
-    background: linear-gradient(
-        118deg,
-        rgba(255, 255, 255, 0.16) 0%,
-        rgba(255, 255, 255, 0.02) 30%,
-        rgba(255, 255, 255, 0) 62%,
-        rgba(255, 255, 255, 0.07) 100%
-    );
+        inset 0 1px 0 rgba(255, 255, 255, 0.14),
+        0 16px 40px -22px rgba(0, 0, 0, 0.8);
 }
 
 @supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
