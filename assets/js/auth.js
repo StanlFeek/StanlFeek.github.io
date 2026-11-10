@@ -294,6 +294,7 @@
       comments: { label: "留言审核", render: renderComments },
       links: { label: "友链审核", render: renderLinks },
       users: { label: "用户管理", render: renderUsers },
+      account: { label: "账号", render: renderAccount },
     };
     var current = "comments";
 
@@ -380,7 +381,7 @@
               var content = el("td", "admin-content", row.content);
               tr.appendChild(content);
               tr.appendChild(el("td", "admin-status " + row.status, row.status));
-              tr.appendChild(el("td", "admin-dim", fmt(row.created_at)));
+              tr.appendChild(el("td", "admin-dim", fmt(row.created_at).slice(0, 10)));
               var ops = el("td", "admin-ops");
               if (row.status !== "approved")
                 ops.appendChild(btn("通过", "ok", function () { setComment(row.id, "approved"); }));
@@ -441,7 +442,7 @@
               tr.appendChild(td);
               tr.appendChild(el("td", "admin-dim", row.desc || ""));
               tr.appendChild(el("td", "admin-status " + row.status, row.status));
-              tr.appendChild(el("td", "admin-dim", fmt(row.created_at)));
+              tr.appendChild(el("td", "admin-dim", fmt(row.created_at).slice(0, 10)));
               var ops = el("td", "admin-ops");
               if (row.status !== "approved")
                 ops.appendChild(btn("通过", "ok", function () { setLink(row.id, "approved"); }));
@@ -485,6 +486,91 @@
         });
     }
 
+    function renderAccount() {
+      panel.textContent = "";
+
+      var card = el("div", "auth-card");
+      var head = el("p", "admin-note");
+      head.textContent = "修改密码后，其他设备上的登录会立即失效。";
+      card.appendChild(head);
+
+      var f1 = el("label", "auth-field");
+      f1.appendChild(el("span", null, "当前密码"));
+      var i1 = el("input", "auth-input");
+      i1.type = "password";
+      i1.autocomplete = "current-password";
+      f1.appendChild(i1);
+
+      var f2 = el("label", "auth-field");
+      f2.appendChild(el("span", null, "新密码（至少 8 位）"));
+      var i2 = el("input", "auth-input");
+      i2.type = "password";
+      i2.autocomplete = "new-password";
+      f2.appendChild(i2);
+
+      var f3 = el("label", "auth-field");
+      f3.appendChild(el("span", null, "再输一次"));
+      var i3 = el("input", "auth-input");
+      i3.type = "password";
+      i3.autocomplete = "new-password";
+      f3.appendChild(i3);
+
+      var submit = el("button", "auth-btn", "更新密码");
+      submit.type = "button";
+      var msg = el("p", "auth-status");
+
+      submit.addEventListener("click", function () {
+        msg.className = "auth-status";
+        msg.textContent = "";
+        if (i2.value.length < 8) {
+          msg.className = "auth-status bad";
+          msg.textContent = "新密码至少 8 位";
+          return;
+        }
+        if (i2.value !== i3.value) {
+          msg.className = "auth-status bad";
+          msg.textContent = "两次输入的新密码不一样";
+          return;
+        }
+        submit.disabled = true;
+        api("/auth/password", {
+          method: "POST",
+          body: { current: i1.value, next: i2.value },
+        })
+          .then(function (d) {
+            msg.className = "auth-status ok";
+            msg.textContent = d.message || "密码已更新";
+            i1.value = "";
+            i2.value = "";
+            i3.value = "";
+          })
+          .catch(function (e) {
+            msg.className = "auth-status bad";
+            msg.textContent = e.message;
+          })
+          .then(function () {
+            submit.disabled = false;
+          });
+      });
+
+      card.appendChild(f1);
+      card.appendChild(f2);
+      card.appendChild(f3);
+      card.appendChild(submit);
+      card.appendChild(msg);
+      panel.appendChild(card);
+
+      // 顺手给个退出登录的入口，改完密码不用再翻导航
+      var out = el("button", "auth-btn ghost small", "退出登录");
+      out.type = "button";
+      out.addEventListener("click", function () {
+        api("/auth/logout", { method: "POST" }).then(function () {
+          location.href = "/";
+        });
+      });
+      panel.appendChild(out);
+    }
+
     function renderUsers() {
       panel.textContent = "加载中…";
       api("/admin/users")
@@ -499,7 +585,7 @@
               tr.appendChild(el("td", null, row.role === "admin" ? "管理员" : "用户"));
               tr.appendChild(el("td", "admin-status " + row.status, row.status));
               tr.appendChild(el("td", null, String(row.comments)));
-              tr.appendChild(el("td", "admin-dim", fmt(row.created_at)));
+              tr.appendChild(el("td", "admin-dim", fmt(row.created_at).slice(0, 10)));
               var ops = el("td", "admin-ops");
               if (row.id === user.id) {
                 ops.appendChild(el("span", "admin-dim", "（自己）"));
@@ -512,6 +598,7 @@
                   ops.appendChild(btn("设为管理员", "", function () { setUser(row.id, { role: "admin" }); }));
                 else
                   ops.appendChild(btn("降为普通", "", function () { setUser(row.id, { role: "user" }); }));
+                ops.appendChild(btn("重置密码", "", function () { resetPassword(row); }));
               }
               tr.appendChild(ops);
               return tr;
@@ -520,6 +607,22 @@
         })
         .catch(function (e) {
           panel.textContent = e.message;
+        });
+    }
+
+    function resetPassword(row) {
+      var next = window.prompt("给 " + row.nickname + "（" + row.email + "）设置新密码，至少 8 位：");
+      if (next === null) return;
+      if (next.length < 8) {
+        status.textContent = "新密码至少 8 位";
+        return;
+      }
+      api("/admin/users", { method: "PATCH", body: { id: row.id, password: next } })
+        .then(function () {
+          status.textContent = "已重置 " + row.nickname + " 的密码，对方需要重新登录";
+        })
+        .catch(function (e) {
+          status.textContent = e.message;
         });
     }
 

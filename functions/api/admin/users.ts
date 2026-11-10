@@ -1,10 +1,12 @@
 /**
  * GET   /api/admin/users
- * PATCH /api/admin/users  { id, status? , role? }
+ * PATCH /api/admin/users  { id, status? , role?, password? }
+ *
+ * password 是管理员给用户重置密码，重置后该用户的所有会话作废。
  */
 
 import type { Env } from "../_middleware";
-import { json, currentUser } from "../auth/_lib";
+import { json, currentUser, hashPassword, validPassword } from "../auth/_lib";
 
 export const onRequestGet: PagesFunction<Env> = async ({ env }) => {
   const { results } = await env.DB.prepare(
@@ -40,6 +42,29 @@ export const onRequestPatch: PagesFunction<Env> = async ({ request, env }) => {
       return json({ ok: false, error: "self-demote", message: "不能降级自己" }, 400);
     sets.push(`role = ?${binds.length + 1}`);
     binds.push(body.role);
+  }
+
+  if (typeof body?.password === "string" && body.password) {
+    const next = validPassword(body.password);
+    if (!next) {
+      return json({ ok: false, error: "bad-password", message: "新密码至少 8 位" }, 400);
+    }
+    await env.DB.prepare(`UPDATE users SET password_hash = ?1 WHERE id = ?2`)
+      .bind(await hashPassword(next), id)
+      .run();
+    if (me?.id === id) {
+      // 重置自己的密码：保留当前会话，否则管理员会把自己踢下线
+      await env.DB.prepare(
+        `DELETE FROM sessions WHERE user_id = ?1 AND token_hash != (
+           SELECT token_hash FROM sessions WHERE user_id = ?1
+            ORDER BY created_at DESC LIMIT 1)`
+      )
+        .bind(id)
+        .run();
+    } else {
+      await env.DB.prepare(`DELETE FROM sessions WHERE user_id = ?1`).bind(id).run();
+    }
+    return json({ ok: true, id, passwordReset: true });
   }
 
   if (!sets.length) return json({ ok: false, error: "nothing-to-update" }, 400);

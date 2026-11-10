@@ -191,14 +191,14 @@
 
 .admin-table {
   width: 100%;
-  min-width: 680px;
+  min-width: 470px;
   border-collapse: collapse;
   font-size: 0.86rem;
 }
 
 .admin-table th,
 .admin-table td {
-  padding: 0.5rem 0.55rem;
+  padding: 0.45rem 0.4rem;
   text-align: left;
   vertical-align: top;
   border-bottom: 1px solid var(--border);
@@ -255,4 +255,18 @@
 .admin-note {
   font-size: 0.84rem;
   color: var(--secondary);
+}
+
+.auth-status.ok { color: #1a7f4b; }
+.auth-status.bad { color: #b4293a; }
+:root[data-theme="dark"] .auth-status.ok { color: #6ddba0; }
+:root[data-theme="dark"] .auth-status.bad { color: #ff8c9a; }
+
+/* 后台页面需要更宽的内容区，否则 8 列表格必然横向滚动 */
+.main:has([data-admin]) {
+    --main-width: 1000px;
+}
+
+.post-single:has([data-admin]) {
+    padding: 24px 26px 20px;
 }

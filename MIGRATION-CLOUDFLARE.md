@@ -396,12 +396,21 @@ curl.exe -sS "https://stanl.top/api/admin/comments?status=pending" -H "Authoriza
 | POST | `/api/auth/send-code` | `{email}` → 发 6 位验证码（无密钥时 `mailSent:false`） |
 | POST | `/api/auth/register` | `{email,nickname,password,code?}` → 201 + Set-Cookie |
 | POST | `/api/auth/login` | `{email,password}` → 200 + Set-Cookie |
+| POST | `/api/auth/password` | `{current,next}` → 改自己的密码；成功后作废该账号全部旧会话，并发一个新 cookie |
 | POST | `/api/auth/logout` | 删会话 + 清 cookie |
 | GET | `/api/auth/me` | `{ok,user\|null}` |
 | GET/PATCH/DELETE | `/api/admin/comments` | 审核列表 / 改状态 / 删 |
 | GET/PATCH | `/api/admin/links` | 友链审核 |
-| GET/PATCH | `/api/admin/users` | 用户列表 / 封禁·角色 |
+| GET/PATCH | `/api/admin/users` | 用户列表 / 封禁·角色 / `{id,password}` 重置密码 |
 | GET | `/api/admin/overview` | 留言·待审·友链·用户·总浏览 |
+
+改密码的几条规则（`functions/api/auth/password.ts`）：
+
+- 必须登录态；`current` 校验失败累计 5 次后锁 15 分钟（KV `pw:<userId>`）
+- 新密码 ≥ 8 位，且不能和旧密码相同
+- 成功后 `DELETE FROM sessions WHERE user_id = ?`，再为当前浏览器重建一条——所以**其他设备会被踢下线**
+- 后台「用户管理」里的「重置密码」走 `PATCH /api/admin/users {id,password}`；管理员重置自己时保留当前会话，重置别人时清空对方全部会话
+
 
 删除单条留言仍走 `DELETE /api/comments/<id>`（带令牌），`?id=` 形式返回 405。
 
