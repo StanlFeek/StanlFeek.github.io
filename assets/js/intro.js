@@ -22,6 +22,7 @@
     const colors = dark ? ['215,222,231', '130,221,198', '226,183,123'] : ['80,89,103', '24,124,112', '155,101,49'];
     let width, height, particles, frame, lastTime = 0, progress = 0, settling = null;
     let drag = null, idleTimer, finished = false, exiting = false, revealStart = null;
+    let typeTimer = null, quoteTimer = null;
     const pointer = { x: -1000, y: -1000 };
     const clamp = value => Math.min(1, Math.max(0, value));
 
@@ -54,6 +55,8 @@
         finished = true;
         cancelAnimationFrame(frame);
         clearTimeout(idleTimer);
+        clearTimeout(typeTimer);
+        clearTimeout(quoteTimer);
         events.abort();
         root.classList.remove('intro-active', 'intro-pending', 'intro-revealing');
         root.style.removeProperty('--intro-blog-opacity');
@@ -148,7 +151,7 @@
     }, { passive: false });
 
     on(intro, 'pointerdown', event => {
-        if (exiting || event.button !== 0 || event.target.closest('button')) return;
+        if (exiting || event.button !== 0 || event.target.closest('button, .intro-quote')) return;
         clearTimeout(idleTimer);
         settling = null;
         drag = { id: event.pointerId, y: event.clientY, start: progress };
@@ -168,7 +171,7 @@
     });
     on(intro, 'pointercancel', () => { drag = null; settle(0); });
     on(intro, 'pointerleave', () => { pointer.x = pointer.y = -1000; });
-    on(intro.querySelector('button'), 'click', () => settle(1));
+    on(intro.querySelector('.intro-enter'), 'click', () => settle(1));
     on(document, 'keydown', event => {
         if (event.ctrlKey || event.metaKey || event.altKey) return;
         if (['ArrowUp', 'ArrowDown', 'PageDown', ' ', 'Enter', 'Escape'].includes(event.key)) {
@@ -184,6 +187,90 @@
     });
     on(reducedMotion, 'change', event => { if (event.matches) finish(); });
     on(window, 'pagehide', finish);
+
+    // ── 打字机欢迎语（自动轮换） ──────────────────────────────
+    const lang = intro.dataset.lang === 'en' ? 'en' : 'zh';
+    const phrases = lang === 'en'
+        ? ['Welcome to my little corner', 'Notes on code and life', 'Slowly written, kept for long']
+        : ['欢迎来到我的小窝', '记录技术与生活的地方', '写点想写的，留点想留的', '慢一点，也没关系'];
+    const greetings = lang === 'en'
+        ? [
+            ['The days are long, but the years are short.', 'Gretchen Rubin'],
+            ['We are all in the gutter, but some of us are looking at the stars.', 'Oscar Wilde'],
+            ['What is past is prologue.', 'William Shakespeare'],
+            ['Life is not what one lived, but what one remembers.', 'García Márquez'],
+            ['Slow is smooth, smooth is fast.', 'Unknown'],
+            ['Keep the love, head for the mountains and the sea.', 'Unknown']
+        ]
+        : [
+            ['星光不问赶路人，时光不负有心人。', '佚名'],
+            ['凡是过往，皆为序章。', '莎士比亚'],
+            ['我们都在阴沟里，但仍有人仰望星空。', '王尔德'],
+            ['生活不是我们活过的日子，而是我们记住的日子。', '马尔克斯'],
+            ['慢慢来，比较快。', '佚名'],
+            ['日拱一卒，功不唐捐。', '佚名'],
+            ['保持热爱，奔赴山海。', '佚名'],
+            ['愿你走出半生，归来仍是少年。', '佚名']
+        ];
+
+    const greetingText = intro.querySelector('.intro-greeting-text');
+    const quoteText = intro.querySelector('.intro-quote-text');
+    const quoteAuthor = intro.querySelector('.intro-quote-author');
+    const quoteBox = intro.querySelector('.intro-quote');
+    const refreshBtn = intro.querySelector('.intro-quote-refresh');
+    let phraseIndex = 0, charIndex = 0, deleting = false;
+
+    function typeStep() {
+        if (finished) return;
+        const phrase = phrases[phraseIndex % phrases.length];
+        charIndex += deleting ? -1 : 1;
+        greetingText.textContent = phrase.slice(0, Math.max(0, charIndex));
+        let delay = deleting ? 34 : 68;
+        if (!deleting && charIndex >= phrase.length) {
+            deleting = true;
+            delay = 2100;
+        } else if (deleting && charIndex <= 0) {
+            deleting = false;
+            phraseIndex += 1;
+            delay = 420;
+        }
+        typeTimer = setTimeout(typeStep, delay);
+    }
+
+    let quoteIndex = Math.floor(Math.random() * greetings.length);
+
+    function paintQuote(first) {
+        if (finished) return;
+        if (!first) {
+            quoteIndex = (quoteIndex + 1 + Math.floor(Math.random() * (greetings.length - 1))) % greetings.length;
+        }
+        const [text, author] = greetings[quoteIndex % greetings.length];
+        clearTimeout(quoteTimer);
+        if (first) {
+            quoteText.textContent = text;
+            quoteAuthor.textContent = '—— ' + author;
+            return;
+        }
+        quoteText.style.opacity = '0';
+        quoteAuthor.style.opacity = '0';
+        quoteTimer = setTimeout(() => {
+            if (finished) return;
+            quoteText.textContent = text;
+            quoteAuthor.textContent = '—— ' + author;
+            quoteText.style.opacity = '1';
+            quoteAuthor.style.opacity = '1';
+        }, 160);
+    }
+
+    if (greetingText && quoteText) {
+        paintQuote(true);
+        quoteBox.style.pointerEvents = 'auto';
+        on(refreshBtn, 'click', event => {
+            event.stopPropagation();
+            paintQuote(false);
+        });
+        typeTimer = setTimeout(typeStep, 900);
+    }
 
     intro.hidden = false;
     root.classList.replace('intro-pending', 'intro-active');
