@@ -63,6 +63,7 @@
         content.forEach((element, index) => { element.inert = previousInert[index]; });
         try { sessionStorage.setItem('blog-intro-seen', '1'); } catch (_) {}
         intro.remove();
+        document.dispatchEvent(new CustomEvent('stanl:intro-done'));
         const main = document.querySelector('main');
         const tabIndex = main.getAttribute('tabindex');
         main.setAttribute('tabindex', '-1');

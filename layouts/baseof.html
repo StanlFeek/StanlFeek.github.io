@@ -24,6 +24,7 @@
     {{- partial "bgvideo.html" . }}
     {{- if .IsHome }}{{ partial "intro.html" . }}{{ end }}
     {{ partialCached "header.html" . .Page -}}
+    {{- partial "danmaku-global.html" . }}
     <main class="main">
         {{- block "main" . }}{{ end }}
     </main>
