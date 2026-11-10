@@ -173,13 +173,13 @@ html.intro-active,
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 104%;
-    height: 150%;
+    width: 108%;
+    height: 168%;
     transform: translate(-50%, -50%);
     background:
-        radial-gradient(closest-side, rgba(74, 152, 226, 0.62), rgba(74, 152, 226, 0) 74%) 22% 34% / 74% 96% no-repeat,
-        radial-gradient(closest-side, rgba(112, 196, 210, 0.5), rgba(112, 196, 210, 0) 74%) 82% 58% / 66% 92% no-repeat,
-        radial-gradient(closest-side, rgba(170, 176, 214, 0.45), rgba(170, 176, 214, 0) 74%) 56% 92% / 60% 84% no-repeat;
+        radial-gradient(closest-side, rgba(74, 152, 226, 0.5), rgba(74, 152, 226, 0) 76%) 14% 32% / 62% 100% no-repeat,
+        radial-gradient(closest-side, rgba(112, 196, 210, 0.44), rgba(112, 196, 210, 0) 76%) 50% 78% / 60% 96% no-repeat,
+        radial-gradient(closest-side, rgba(170, 176, 214, 0.4), rgba(170, 176, 214, 0) 76%) 88% 42% / 58% 100% no-repeat;
     filter: blur(30px) saturate(125%);
     opacity: 1;
     pointer-events: none;
