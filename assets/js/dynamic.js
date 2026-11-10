@@ -12,6 +12,27 @@
 
   var API = "/api";
 
+  // 当 DNS 缓存仍指向旧站点（GitHub Pages）时，/api/* 会返回一整张 HTML 页面。
+  // 不把 JSON.parse 的原始报错抛给用户，换成人话。
+  function badOrigin() {
+    var e = new Error("站点正在切换，接口暂时连不上。请按 Ctrl+F5 强制刷新，或过几分钟再试。");
+    e.code = "BAD_ORIGIN";
+    return e;
+  }
+
+  function readJson(r) {
+    return r.text().then(function (t) {
+      var s = (t || "").trim();
+      if (!s) return {};
+      if (s.charAt(0) === "<") throw badOrigin();
+      try {
+        return JSON.parse(s);
+      } catch (err) {
+        throw badOrigin();
+      }
+    });
+  }
+
   function qs(sel, root) {
     return (root || document).querySelector(sel);
   }
@@ -58,7 +79,7 @@
         body: JSON.stringify({ path: path }),
       })
         .then(function (r) {
-          return r.ok ? r.json() : Promise.reject(r.status);
+          return r.ok ? readJson(r) : Promise.reject(r.status);
         })
         .then(function (d) {
           node.textContent = (d.views || 0).toLocaleString() + " 次浏览";
@@ -83,9 +104,7 @@
       function load() {
         listBox.textContent = "加载中…";
         fetch(API + "/comments?path=" + encodeURIComponent(path) + "&limit=100")
-          .then(function (r) {
-            return r.json();
-          })
+          .then(readJson)
           .then(function (d) {
             listBox.textContent = "";
             if (!d.items || !d.items.length) {
@@ -120,8 +139,9 @@
               listBox.appendChild(card);
             });
           })
-          .catch(function () {
-            listBox.textContent = "加载失败，稍后再试。";
+          .catch(function (err) {
+            listBox.textContent =
+              err && err.code === "BAD_ORIGIN" ? err.message : "加载失败，稍后再试。";
           });
       }
 
@@ -200,7 +220,7 @@
           body: JSON.stringify(data),
         })
           .then(function (r) {
-            return r.json().then(function (d) {
+            return readJson(r).then(function (d) {
               return { ok: r.ok, d: d };
             });
           })
@@ -248,7 +268,7 @@
           body: JSON.stringify(data),
         })
           .then(function (r) {
-            return r.json().then(function (d) {
+            return readJson(r).then(function (d) {
               return { ok: r.ok, d: d };
             });
           })

@@ -135,7 +135,15 @@
 
     fetch(API + "/comments?path=" + encodeURIComponent(path) + "&limit=100")
       .then(function (r) {
-        return r.json();
+        return r.text().then(function (t) {
+          var s = (t || "").trim();
+          if (s.charAt(0) === "<") throw new Error("site-switching");
+          try {
+            return JSON.parse(s);
+          } catch (e) {
+            throw new Error("site-switching");
+          }
+        });
       })
       .then(function (d) {
         pending = (d.items || []).filter(function (x) {
@@ -160,8 +168,11 @@
         timer = setInterval(tick, GAP_MS);
         tick();
       })
-      .catch(function () {
-        empty.textContent = "弹幕加载失败，稍后再试。";
+      .catch(function (err) {
+        empty.textContent =
+          err && err.message === "site-switching"
+            ? "站点正在切换，弹幕稍后恢复。请按 Ctrl+F5 强制刷新。"
+            : "弹幕加载失败，稍后再试。";
       });
 
     // 新留言即时飞入

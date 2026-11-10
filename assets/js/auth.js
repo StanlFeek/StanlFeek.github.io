@@ -35,7 +35,24 @@
       opts.body = JSON.stringify(opts.body);
     }
     return fetch(API + path, opts).then(function (r) {
-      return r.json().then(function (d) {
+      return r.text().then(function (t) {
+        var s = (t || "").trim();
+        var d = {};
+        if (!s) {
+          d = {};
+        } else if (s.charAt(0) === "<") {
+          var bad = new Error("站点正在切换，接口暂时连不上。请按 Ctrl+F5 强制刷新，或过几分钟再试。");
+          bad.code = "BAD_ORIGIN";
+          throw bad;
+        } else {
+          try {
+            d = JSON.parse(s);
+          } catch (e) {
+            var bad2 = new Error("站点正在切换，接口暂时连不上。请按 Ctrl+F5 强制刷新，或过几分钟再试。");
+            bad2.code = "BAD_ORIGIN";
+            throw bad2;
+          }
+        }
         if (!r.ok) {
           var err = new Error(d.message || d.error || "请求失败");
           err.data = d;
