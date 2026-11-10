@@ -1,0 +1,9 @@
+# Cloudflare Pages 重定向规则
+# 语法：<来源> <目标> [状态码]
+# 仅在域名绑定到 Pages 后生效。
+
+# www → 主域（301，SEO 归一，避免重复内容）
+https://www.stanl.top/*  https://stanl.top/:splat  301!
+
+# 旧式 .html 后缀的来访链接归一到干净 URL
+/posts/*.html  /posts/:splat  301!
