@@ -12,16 +12,19 @@
                 <span class="intro-greeting-text"></span><span class="intro-greeting-caret" aria-hidden="true"></span>
             </p>
 
-            <div class="intro-quote">
-                <p class="intro-quote-text"></p>
-                <div class="intro-quote-meta">
-                    <span class="intro-quote-author"></span>
-                    <button class="intro-quote-refresh" type="button" title="{{ if $english }}Another one{{ else }}换一句{{ end }}" aria-label="{{ if $english }}Another one{{ else }}换一句{{ end }}">
-                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                            <polyline points="21 3 21 9 15 9"></polyline>
-                            <path d="M20.4 14a8.5 8.5 0 1 1-2.1-8.8L21 9"></path>
-                        </svg>
-                    </button>
+            <div class="intro-quote-wrap">
+                <span class="intro-aura" aria-hidden="true"></span>
+                <div class="intro-quote">
+                    <p class="intro-quote-text"></p>
+                    <div class="intro-quote-meta">
+                        <span class="intro-quote-author"></span>
+                        <button class="intro-quote-refresh" type="button" title="{{ if $english }}Another one{{ else }}换一句{{ end }}" aria-label="{{ if $english }}Another one{{ else }}换一句{{ end }}">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                                <polyline points="21 3 21 9 15 9"></polyline>
+                                <path d="M20.4 14a8.5 8.5 0 1 1-2.1-8.8L21 9"></path>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

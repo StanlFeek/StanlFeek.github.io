@@ -161,46 +161,123 @@ html.intro-active,
 }
 
 /* 圆角毛玻璃语录框 */
-.intro-quote {
+.intro-quote-wrap {
     position: relative;
-    width: min(460px, 100%);
-    margin: 18px auto 0;
-    padding: 16px 20px 12px;
-    border: 1px solid rgba(255, 255, 255, 0.7);
-    border-radius: 16px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.66), rgba(255, 255, 255, 0.3));
-    box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.9),
-        0 14px 34px -20px rgba(20, 26, 34, 0.55);
-    -webkit-backdrop-filter: blur(14px) saturate(160%);
-    backdrop-filter: blur(14px) saturate(160%);
-    text-align: left;
-    pointer-events: auto;
+    width: min(470px, 100%);
+    margin: 20px auto 0;
     animation: intro-appear 900ms 820ms both;
 }
 
-:root[data-theme="dark"] .intro-quote {
-    border-color: rgba(255, 255, 255, 0.16);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.035));
+/* 卡后面的一层彩色光斑：没有它就无从「透」起 */
+.intro-aura {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 104%;
+    height: 150%;
+    transform: translate(-50%, -50%);
+    background:
+        radial-gradient(closest-side, rgba(74, 152, 226, 0.62), rgba(74, 152, 226, 0) 74%) 22% 34% / 74% 96% no-repeat,
+        radial-gradient(closest-side, rgba(112, 196, 210, 0.5), rgba(112, 196, 210, 0) 74%) 82% 58% / 66% 92% no-repeat,
+        radial-gradient(closest-side, rgba(170, 176, 214, 0.45), rgba(170, 176, 214, 0) 74%) 56% 92% / 60% 84% no-repeat;
+    filter: blur(30px) saturate(125%);
+    opacity: 1;
+    pointer-events: none;
+}
+
+.intro-quote {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    padding: 18px 22px 14px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    border-radius: 18px;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.08));
     box-shadow:
-        inset 0 1px 0 rgba(255, 255, 255, 0.12),
-        0 14px 34px -20px rgba(0, 0, 0, 0.9);
+        inset 0 1px 0 rgba(255, 255, 255, 0.95),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.3),
+        0 18px 44px -24px rgba(20, 26, 34, 0.55);
+    -webkit-backdrop-filter: blur(26px) saturate(160%);
+    backdrop-filter: blur(26px) saturate(160%);
+    text-align: left;
+    pointer-events: auto;
+    overflow: hidden;
+}
+
+/* 斜向高光：液态玻璃的那道反光 */
+.intro-quote::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        118deg,
+        rgba(255, 255, 255, 0.55) 0%,
+        rgba(255, 255, 255, 0.06) 26%,
+        rgba(255, 255, 255, 0) 58%,
+        rgba(255, 255, 255, 0.18) 82%,
+        rgba(255, 255, 255, 0.34) 100%
+    );
+    pointer-events: none;
+}
+
+:root[data-theme="dark"] .intro-aura {
+    opacity: 0.75;
+    filter: blur(30px) saturate(120%);
+}
+
+:root[data-theme="dark"] .intro-quote {
+    border-color: rgba(255, 255, 255, 0.2);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04));
+    box-shadow:
+        inset 0 1px 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+        0 18px 44px -24px rgba(0, 0, 0, 0.85);
+}
+
+:root[data-theme="dark"] .intro-quote::after {
+    background: linear-gradient(
+        118deg,
+        rgba(255, 255, 255, 0.16) 0%,
+        rgba(255, 255, 255, 0.02) 30%,
+        rgba(255, 255, 255, 0) 62%,
+        rgba(255, 255, 255, 0.07) 100%
+    );
+}
+
+@supports not ((backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))) {
+    .intro-quote {
+        background: rgba(250, 251, 252, 0.94);
+    }
+    :root[data-theme="dark"] .intro-quote {
+        background: rgba(24, 27, 32, 0.94);
+    }
 }
 
 .intro-quote-text {
+    position: relative;
+    z-index: 1;
     margin: 0;
     color: var(--intro-foreground);
-    font-size: 15px;
-    line-height: 1.65;
+    font-size: 15.5px;
+    line-height: 1.7;
+    letter-spacing: 0.01em;
+    text-shadow: 0 1px 0 rgba(255, 255, 255, 0.35);
     transition: opacity 180ms;
 }
 
+:root[data-theme="dark"] .intro-quote-text {
+    text-shadow: 0 1px 0 rgba(0, 0, 0, 0.35);
+}
+
 .intro-quote-meta {
+    position: relative;
+    z-index: 1;
     display: flex;
     align-items: center;
     justify-content: flex-end;
     gap: 10px;
-    margin-top: 6px;
+    margin-top: 8px;
 }
 
 .intro-quote-author {
@@ -328,7 +405,8 @@ html.intro-active,
     .intro-name { font-size: 15px; margin-top: 14px; }
     .intro-greeting { margin-top: 18px; font-size: 19px; }
     .intro-greeting-text { white-space: normal; }
-    .intro-quote { margin-top: 14px; padding: 12px 14px 10px; border-radius: 14px; }
+    .intro-quote-wrap { margin-top: 14px; }
+    .intro-quote { padding: 12px 14px 10px; border-radius: 16px; }
     .intro-quote-text { font-size: 14px; }
     .intro-enter { bottom: max(20px, env(safe-area-inset-bottom)); }
 }
@@ -341,7 +419,8 @@ html.intro-active,
     .intro-code { margin-bottom: 10px; font-size: 14px; }
     .intro-name { margin-top: 10px; font-size: 14px; }
     .intro-greeting { margin-top: 12px; font-size: 18px; }
-    .intro-quote { margin-top: 10px; padding: 10px 14px 8px; }
+    .intro-quote-wrap { margin-top: 10px; }
+    .intro-quote { padding: 10px 14px 8px; }
     .intro-quote-text { font-size: 13px; }
     .intro-enter { bottom: 6px; min-height: 60px; gap: 4px; }
 }
