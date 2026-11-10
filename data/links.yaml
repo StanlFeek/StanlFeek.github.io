@@ -1,0 +1,11 @@
+# 友链数据
+#
+# 审核通过的友链写在这里，格式：
+#   - name: 站点名称
+#     url: https://example.com
+#     avatar: https://example.com/avatar.png
+#     desc: 一句话介绍
+#
+# 通过 /api/links 提交的申请会先进入 D1 的 link_requests 表（status=pending），
+# 审核后把记录挪到本文件，或直接把 status 改成 approved 由 /api/links 返回。
+[]

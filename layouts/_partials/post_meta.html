@@ -18,6 +18,11 @@
     {{- end }}
 {{- end }}
 
+{{- /* 浏览量：仅单篇文章页渲染，由 /api/view 异步填充 */ -}}
+{{- if and (eq .Kind "page") (default true site.Params.enablePageViews) -}}
+    {{- $scratch.Add "meta" (slice (printf "<span data-pageviews data-path='%s'>— 次浏览</span>" .RelPermalink)) }}
+{{- end }}
+
 {{/* Combine all meta information into a single string with separators and render it as HTML.*/}}
 
 {{- with ($scratch.Get "meta") }}

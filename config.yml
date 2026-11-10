@@ -35,12 +35,18 @@ languages:
         - name: 标签
           url: tags/
           weight: 4
+        - name: 友链
+          url: links/
+          weight: 5
+        - name: 留言板
+          url: guestbook/
+          weight: 6
         - name: 搜索
           url: search/?v=2
-          weight: 5
+          weight: 7
         - name: 关于
           url: about/?v=2
-          weight: 6
+          weight: 8
 
   en:
     languageName: "English"
@@ -65,12 +71,18 @@ languages:
         - name: Tags
           url: tags/
           weight: 4
+        - name: Links
+          url: links/
+          weight: 5
+        - name: Guestbook
+          url: guestbook/
+          weight: 6
         - name: Search
           url: search/?v=2
-          weight: 5
+          weight: 7
         - name: About
           url: about/?v=2
-          weight: 6
+          weight: 8
     params:
       description: "My personal blog about technology, design, reading and making things."
       author: "StanlFeek"
@@ -115,6 +127,7 @@ params:
   ShowAllPagesInArchive: true
   ShowPageNums: true
   ShowToc: true
+  enablePageViews: true
   displayFullLangName: true
 
   # QQ 号：站点图标（favicon / apple-touch-icon）直接取这个号的 QQ 头像。

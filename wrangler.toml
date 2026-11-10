@@ -1,0 +1,30 @@
+# Cloudflare Pages 项目配置
+# 文档：https://developers.cloudflare.com/pages/functions/wrangler-configuration/
+
+name = "stanl-top"
+compatibility_date = "2026-11-01"
+compatibility_flags = ["nodejs_compat"]
+pages_build_output_dir = "public"
+
+# ── D1（浏览量 / 留言 / 友链申请）─────────────────────────────
+[[d1_databases]]
+binding = "DB"
+database_name = "stanl-blog"
+database_id = "883054b0-9b04-41a9-9d8f-05ddeeb027d8"
+
+# ── KV（浏览量去重 + 接口限流）────────────────────────────────
+[[kv_namespaces]]
+binding = "KV"
+id = "0fc9d21e320f4858b50991b9a6656a79"
+
+# ── R2（图片 / 相册）──────────────────────────────────────────
+# 当前账号尚未开通 R2（需在控制台 R2 → 开通，绑支付方式）。
+# 开通后执行 `npx wrangler r2 bucket create stanl-images`，再取消下面三行注释，
+# 然后到 R2 → stanl-images → Settings → Custom Domains 添加 img.stanl.top。
+# 未开通时 /api/health 会把 r2 标为 disabled，/api/upload 与 /api/photos 返回 503。
+# [[r2_buckets]]
+# binding = "R2"
+# bucket_name = "stanl-images"
+
+[vars]
+SITE_NAME = "stanl.top"

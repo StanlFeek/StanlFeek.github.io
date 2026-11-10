@@ -1,0 +1,17 @@
+{
+  "name": "stanl-top",
+  "version": "1.0.0",
+  "private": true,
+  "description": "stanl.top — Hugo blog on Cloudflare Pages",
+  "scripts": {
+    "dev": "hugo server -D",
+    "build": "hugo --minify --gc",
+    "deploy": "hugo --minify --gc && wrangler pages deploy public --project-name stanl-top --branch main",
+    "db:init": "wrangler d1 execute stanl-blog --remote --file=./schema.sql",
+    "cf:login": "wrangler login",
+    "cf:whoami": "wrangler whoami"
+  },
+  "devDependencies": {
+    "wrangler": "^3.99.0"
+  }
+}

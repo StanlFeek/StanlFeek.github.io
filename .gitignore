@@ -1,11 +1,26 @@
+# 依赖
+node_modules/
+.wrangler/
+.dev.vars
+
+# 令牌（本地保存，勿提交）
+.admin-token.txt
+.cf-token.txt
+.cf-pages-token.txt
+
+# Hugo 构建产物
 public/
 resources/_gen/
 .hugo_build.lock
+
+# 本地工具
 .tools/
+.tscheck/
+.tmp/
 
 # 系统与编辑器
 .DS_Store
 Thumbs.db
+desktop.ini
 .vscode/
 .idea/
-.tmp/

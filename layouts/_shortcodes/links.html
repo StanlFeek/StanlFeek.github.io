@@ -1,0 +1,19 @@
+{{- $links := site.Data.links -}}
+{{- if $links -}}
+<div class="link-grid">
+  {{- range $links }}
+  {{- $name := .name }}
+  <a class="link-card" href="{{ .url }}" target="_blank" rel="noopener">
+    {{- with .avatar }}
+    <img class="link-avatar" src="{{ . }}" alt="{{ $name }}" loading="lazy" width="44" height="44">
+    {{- end }}
+    <span class="link-body">
+      <span class="link-name">{{ $name }}</span>
+      {{- with .desc }}<span class="link-desc">{{ . }}</span>{{ end }}
+    </span>
+  </a>
+  {{- end }}
+</div>
+{{- else -}}
+<p class="link-empty">还没有友链，欢迎来申请第一个。</p>
+{{- end -}}

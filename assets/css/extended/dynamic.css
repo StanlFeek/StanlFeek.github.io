@@ -1,0 +1,149 @@
+/* Cloudflare 动态能力：留言板 / 友链表单 / 浏览量 */
+/* 由 assets/js/dynamic.js 驱动，样式与 PaperMod 主题变量对齐 */
+
+[data-pageviews] {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── 留言区 ──────────────────────────────────────────────── */
+[data-comments] {
+  margin-top: 2rem;
+}
+
+[data-comments] .c-list {
+  margin-bottom: 2rem;
+}
+
+[data-comments] .c-item {
+  padding: 1rem 0;
+  border-top: 1px solid var(--border);
+}
+
+[data-comments] .c-item:first-child {
+  border-top: none;
+}
+
+[data-comments] .c-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0.75rem;
+  margin-bottom: 0.35rem;
+}
+
+[data-comments] .c-name {
+  font-weight: 600;
+  color: var(--primary);
+  text-decoration: none;
+}
+
+[data-comments] a.c-name:hover {
+  text-decoration: underline;
+}
+
+[data-comments] .c-time {
+  font-size: 0.8rem;
+  color: var(--secondary);
+}
+
+[data-comments] .c-body {
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.7;
+}
+
+[data-comments] .c-reply {
+  margin: 0 0 0.6rem;
+  padding: 0.5rem 0.75rem;
+  border-left: 3px solid var(--primary);
+  background: var(--entry);
+  color: var(--secondary);
+  font-size: 0.92rem;
+  border-radius: 0 6px 6px 0;
+}
+
+[data-comments] .c-empty {
+  color: var(--secondary);
+  font-size: 0.92rem;
+}
+
+/* ── 表单 ────────────────────────────────────────────────── */
+[data-comments] .c-form,
+[data-link-form] {
+  display: grid;
+  gap: 0.85rem;
+}
+
+[data-comments] .c-field,
+[data-link-form] .c-field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+[data-comments] .c-label,
+[data-link-form] .c-label {
+  font-size: 0.85rem;
+  color: var(--secondary);
+}
+
+[data-comments] .c-input,
+[data-link-form] .c-input {
+  width: 100%;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  color: var(--primary);
+  background: var(--entry);
+  border: 1px solid var(--border);
+  border-radius: var(--radius, 6px);
+  transition: border-color 0.15s ease;
+}
+
+[data-comments] .c-input:focus,
+[data-link-form] .c-input:focus {
+  outline: none;
+  border-color: var(--primary);
+}
+
+[data-comments] textarea.c-input {
+  resize: vertical;
+  min-height: 6rem;
+}
+
+/* 蜜罐：视觉上完全隐藏，但不使用 display:none（部分机器人会跳过） */
+.c-hp {
+  position: absolute;
+  left: -9999px;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-comments] .c-submit,
+[data-link-form] button {
+  justify-self: start;
+  padding: 0.5rem 1.4rem;
+  font: inherit;
+  font-weight: 500;
+  color: var(--theme);
+  background: var(--primary);
+  border: none;
+  border-radius: var(--radius, 6px);
+  cursor: pointer;
+  transition: opacity 0.15s ease;
+}
+
+[data-comments] .c-submit:hover,
+[data-link-form] button:hover {
+  opacity: 0.85;
+}
+
+[data-comments] .c-submit:disabled,
+[data-link-form] button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.c-status {
+  font-size: 0.88rem;
+  color: var(--secondary);
+}
