@@ -47,6 +47,7 @@ html.intro-active,
 .intro-surface {
     position: absolute;
     inset: 0;
+    z-index: 1;
     color: var(--intro-foreground);
     transform-origin: center;
     will-change: transform;
@@ -168,21 +169,48 @@ html.intro-active,
     animation: intro-appear 900ms 820ms both;
 }
 
-/* 卡后面的一层彩色光斑：没有它就无从「透」起 */
+/* 卡后面的一层流动彩色：没有它就无从「透」起 */
 .intro-aura {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 108%;
-    height: 168%;
+    width: 103%;
+    height: 112%;
     transform: translate(-50%, -50%);
-    background:
-        radial-gradient(closest-side, rgba(74, 152, 226, 0.5), rgba(74, 152, 226, 0) 76%) 14% 32% / 62% 100% no-repeat,
-        radial-gradient(closest-side, rgba(112, 196, 210, 0.44), rgba(112, 196, 210, 0) 76%) 50% 78% / 60% 96% no-repeat,
-        radial-gradient(closest-side, rgba(170, 176, 214, 0.4), rgba(170, 176, 214, 0) 76%) 88% 42% / 58% 100% no-repeat;
-    filter: blur(30px) saturate(125%);
+    border-radius: 20px;
+    overflow: hidden;
+    background: linear-gradient(120deg, #6fb3f2 0%, #7fd8d0 34%, #b3a6ee 66%, #f0b978 100%);
+    filter: blur(14px) saturate(155%);
     opacity: 1;
     pointer-events: none;
+}
+
+/* 旋转的锥形渐变：让颜色在卡片里慢慢流 */
+.intro-aura::before {
+    content: "";
+    position: absolute;
+    inset: -34%;
+    background: conic-gradient(
+        from 0deg,
+        rgba(96, 168, 240, 0.95),
+        rgba(126, 216, 206, 0.85),
+        rgba(178, 164, 238, 0.9),
+        rgba(244, 152, 168, 0.75),
+        rgba(244, 186, 112, 0.8),
+        rgba(96, 168, 240, 0.95)
+    );
+    animation: intro-drift-spin 26s linear infinite;
+}
+
+/* 第二层漂移光斑：叠加出层次 */
+.intro-aura::after {
+    content: "";
+    position: absolute;
+    inset: -30%;
+    background:
+        radial-gradient(closest-side, rgba(120, 210, 255, 0.9), rgba(120, 210, 255, 0) 72%) 18% 24% / 62% 82% no-repeat,
+        radial-gradient(closest-side, rgba(255, 214, 150, 0.8), rgba(255, 214, 150, 0) 72%) 76% 70% / 58% 78% no-repeat;
+    animation: intro-drift-a 18s ease-in-out infinite alternate;
 }
 
 .intro-quote {
@@ -192,13 +220,13 @@ html.intro-active,
     padding: 18px 22px 14px;
     border: 1px solid rgba(255, 255, 255, 0.6);
     border-radius: 18px;
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.34), rgba(255, 255, 255, 0.08));
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.06));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.95),
         inset 0 -1px 0 rgba(255, 255, 255, 0.3),
         0 18px 44px -24px rgba(20, 26, 34, 0.55);
-    -webkit-backdrop-filter: blur(26px) saturate(160%);
-    backdrop-filter: blur(26px) saturate(160%);
+    -webkit-backdrop-filter: blur(20px) saturate(185%);
+    backdrop-filter: blur(20px) saturate(185%);
     text-align: left;
     pointer-events: auto;
     overflow: hidden;
@@ -222,13 +250,30 @@ html.intro-active,
 }
 
 :root[data-theme="dark"] .intro-aura {
-    opacity: 0.75;
-    filter: blur(30px) saturate(120%);
+    filter: blur(14px) saturate(140%) brightness(0.46);
+}
+
+@keyframes intro-drift-spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+@keyframes intro-drift-a {
+    from { transform: translate3d(-6%, -4%, 0) scale(1); }
+    50% { transform: translate3d(8%, 6%, 0) scale(1.14); }
+    to { transform: translate3d(-2%, 10%, 0) scale(0.94); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .intro-aura::before,
+    .intro-aura::after {
+        animation: none !important;
+    }
 }
 
 :root[data-theme="dark"] .intro-quote {
     border-color: rgba(255, 255, 255, 0.2);
-    background: linear-gradient(135deg, rgba(255, 255, 255, 0.13), rgba(255, 255, 255, 0.04));
+    background: linear-gradient(135deg, rgba(10, 12, 16, 0.34), rgba(10, 12, 16, 0.12));
     box-shadow:
         inset 0 1px 0 rgba(255, 255, 255, 0.22),
         inset 0 -1px 0 rgba(255, 255, 255, 0.06),
