@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>手势交互地球仪 · 摄像头手势控制</title>
+    <meta
+      name="description"
+      content="基于 three.js 与 MediaPipe Hands 的可交互 3D 地球仪：用摄像头识别手部动作来旋转、放大、缩小地球。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="icon" href="https://q1.qlogo.cn/g?b=qq&nk=2141077688&s=140" id="qq-favicon" />
+    <link
+      rel="apple-touch-icon"
+      sizes="640x640"
+      href="https://q1.qlogo.cn/g?b=qq&nk=2141077688&s=640"
+      id="qq-touch-icon"
+    />
+    <script>
+      (() => {
+        // 图标直接用 QQ 头像。qlogo 的 Cache-Control 是 30 天，
+        // 所以把缓存键按小时滚动：换头像后最迟下一个整点自动生效。
+        const QQ = '2141077688';
+        const v = Math.floor(Date.now() / 36e5);
+        const url = (s) => 'https://q1.qlogo.cn/g?b=qq&nk=' + QQ + '&s=' + s + '&v=' + v;
+        const fav = document.getElementById('qq-favicon');
+        const touch = document.getElementById('qq-touch-icon');
+        if (fav) fav.href = url(140);
+        if (touch) touch.href = url(640);
+      })();
+    </script>
+    <script type="importmap">
+      {
+        "imports": {
+          "three": "./vendor/three/three.module.js"
+        }
+      }
+    </script>
+  </head>
+  <body>
+    <!-- 3D 场景 -->
+    <canvas id="scene" aria-label="三维地球仪"></canvas>
+
+    <!-- 顶栏 -->
+    <header class="topbar">
+      <div class="brand">
+        <svg class="logo" viewBox="0 0 32 32" aria-hidden="true">
+          <circle cx="16" cy="16" r="12.5" fill="rgba(79,209,255,.10)" stroke="#4fd1ff" stroke-width="1.6" />
+          <ellipse cx="16" cy="16" rx="5.6" ry="12.5" fill="none" stroke="#7c8cff" stroke-width="1.1" />
+          <path d="M3.8 16h24.4M6.2 9.4h19.6M6.2 22.6h19.6" stroke="#7c8cff" stroke-width="1.1" fill="none" />
+          <circle cx="23.5" cy="8.5" r="2.4" fill="#4fd1ff" />
+        </svg>
+        <div class="brand-text">
+          <strong>手势互动地球仪</strong>
+          <span>three.js + MediaPipe Hands · 全部依赖已本地化</span>
+        </div>
+      </div>
+
+      <div class="top-actions">
+        <button id="btn-panel" class="btn panel-toggle" type="button" aria-expanded="false" aria-controls="panel">
+          <span class="ico">☰</span>面板
+        </button>
+        <button id="btn-cam" class="btn btn-primary" type="button" disabled>
+          <span class="ico">📷</span><span class="label">启动摄像头手势</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- 左侧控制面板 -->
+    <aside class="panel" id="panel">
+      <section class="card">
+        <h2>手势指南 <span class="tag">对着摄像头做动作</span></h2>
+        <div class="guide" id="guide">
+          <div class="guide-item" data-gesture="rotate">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="24" cy="24" r="9" fill="none" stroke="#4fd1ff" stroke-width="1.2" opacity=".35" />
+              <path d="M14 30V17.5a2.6 2.6 0 0 1 5.2 0V26M19.2 15.4a2.6 2.6 0 0 1 5.2 0V25M24.4 16.4a2.6 2.6 0 0 1 5.2 0V25"
+                fill="none" stroke="#8fb4ff" stroke-width="2.1" stroke-linecap="round" />
+              <path d="M29.6 19.4a2.6 2.6 0 0 1 5.2 0V30a8 8 0 0 1-8 8h-2.6a8 8 0 0 1-8-8v-1.6"
+                fill="none" stroke="#8fb4ff" stroke-width="2.1" stroke-linecap="round" />
+              <path d="M35 8h6v6" fill="none" stroke="#4fd1ff" stroke-width="2" stroke-linecap="round" />
+              <path d="M41 8l-7 7" stroke="#4fd1ff" stroke-width="2" stroke-linecap="round" />
+            </svg>
+            <div class="gi-body">
+              <strong>张开手掌 · 拖动旋转</strong>
+              <span>手掌往左拨＝地球左转；往右拨＝右转，上下拨＝俯仰</span>
+            </div>
+          </div>
+
+          <div class="guide-item" data-gesture="zoom">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <circle cx="21" cy="21" r="12" fill="none" stroke="#4fd1ff" stroke-width="2.2" />
+              <path d="M30 30l9 9" stroke="#4fd1ff" stroke-width="2.6" stroke-linecap="round" />
+              <path d="M21 15.5v11M15.5 21h11" stroke="#8fb4ff" stroke-width="2.4" stroke-linecap="round" />
+            </svg>
+            <div class="gi-body">
+              <strong>双指捏合 · 缩放</strong>
+              <span>拇指与食指捏近＝缩小；手指伸直拉开＝放大</span>
+            </div>
+          </div>
+
+          <div class="guide-item" data-gesture="reset">
+            <svg viewBox="0 0 48 48" aria-hidden="true">
+              <path d="M14 38V24a2.6 2.6 0 0 1 5.2 0V22a2.6 2.6 0 0 1 5.2 0V21a2.6 2.6 0 0 1 5.2 0V24a2.6 2.6 0 0 1 5.2 0v8a6 6 0 0 1-6 6z"
+                fill="none" stroke="#8fb4ff" stroke-width="2.1" stroke-linejoin="round" />
+              <path d="M25 12a13 13 0 1 1-9.2 3.8" fill="none" stroke="#4fd1ff" stroke-width="2.1" stroke-linecap="round" />
+              <path d="M8.5 12.5l7 .5-.5 7" fill="none" stroke="#4fd1ff" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" />
+            </svg>
+            <div class="gi-body">
+              <strong>握拳按住约 1 秒 · 复位</strong>
+              <span>回到默认视角与默认缩放</span>
+            </div>
+          </div>
+        </div>
+
+        <p class="hint">
+          手臂伸出使手掌占据画面 1/3 左右效果最好；正对光源、背景简洁可显著提升识别率。
+        </p>
+      </section>
+
+      <section class="card">
+        <h2>实时状态 <span class="tag" id="stat-fps">-- FPS</span></h2>
+        <div class="row">
+          <span class="label">识别结果</span>
+          <span class="value" id="stat-gesture" style="min-width: auto">等待摄像头</span>
+        </div>
+        <div class="row">
+          <span class="label">手部关键点</span>
+          <span class="value" id="stat-hands" style="min-width: auto">--</span>
+        </div>
+        <div class="row">
+          <span class="label">推理后端</span>
+          <span class="value" id="stat-delegate" style="min-width: auto">--</span>
+        </div>
+      </section>
+
+      <section class="card">
+        <h2>控制</h2>
+        <div class="row">
+          <span class="label">自动旋转</span>
+          <input class="switch" type="checkbox" id="opt-auto" checked aria-label="自动旋转" />
+        </div>
+        <div class="row">
+          <span class="label">云层</span>
+          <input class="switch" type="checkbox" id="opt-clouds" checked aria-label="显示云层" />
+        </div>
+        <div class="row">
+          <span class="label">显示手部骨架</span>
+          <input class="switch" type="checkbox" id="opt-skeleton" checked aria-label="显示手部骨架" />
+        </div>
+        <div class="row">
+          <span class="label">手势灵敏度</span>
+          <input type="range" id="opt-sens" min="0.4" max="2.6" step="0.1" value="1.25" aria-label="手势灵敏度" />
+          <span class="value" id="val-sens">1.25×</span>
+        </div>
+        <div class="row">
+          <span class="label">画质上限</span>
+          <input type="range" id="opt-res" min="0.6" max="2" step="0.1" value="1.5" aria-label="渲染分辨率倍率" />
+          <span class="value" id="val-res">1.5×</span>
+        </div>
+        <button class="btn btn-block" type="button" id="btn-reset"><span class="ico">⟳</span>重置视角与缩放</button>
+        <button class="btn btn-block" type="button" id="btn-shot"><span class="ico">⬇</span>保存当前画面 PNG</button>
+      </section>
+
+      <p class="fineprint">
+        鼠标 / 触屏同样可用：拖拽旋转、滚轮缩放、双击复位。
+      </p>
+    </aside>
+
+    <!-- 摄像头预览 -->
+    <section class="preview" id="preview-box" hidden>
+      <div class="preview-head">
+        <i class="dot" id="cam-dot"></i>
+        <span>摄像头预览</span>
+        <span class="chip" id="preview-gesture">未检测到手</span>
+      </div>
+      <div class="stage">
+        <video id="cam" playsinline muted autoplay></video>
+        <canvas id="preview" width="480" height="360"></canvas>
+        <div class="stage-empty" id="stage-empty">正在启动摄像头…</div>
+      </div>
+      <div class="preview-foot">
+        <span id="preview-res">--</span>
+        <span class="spacer"></span>
+        <button class="linkish" type="button" id="btn-cam-off">关闭摄像头</button>
+      </div>
+    </section>
+
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+
+    <!-- 加载遮罩 -->
+    <div class="overlay" id="overlay">
+      <div class="spinner"></div>
+      <div class="overlay-text" id="overlay-text">正在加载地球与手势识别引擎…</div>
+      <div class="overlay-bar"><i id="overlay-bar"></i></div>
+      <div class="overlay-sub" id="overlay-sub">首次加载约 38 MB 本地资源，之后完全离线</div>
+    </div>
+
+    <noscript>
+      <div class="overlay">
+        <div class="overlay-text">本页面需要启用 JavaScript 才能运行。</div>
+      </div>
+    </noscript>
+
+    <script type="module" src="./src/main.js"></script>
+    <script>
+      // 模块加载失败（例如浏览器过旧或缺少 WebGL）时给出明确提示，而不是白屏。
+      window.addEventListener('error', (e) => {
+        const el = document.getElementById('overlay-text');
+        if (el && e.target && e.target.tagName === 'SCRIPT') {
+          el.textContent = '脚本加载失败：' + (e.target.src || '');
+          document.getElementById('overlay-sub').textContent = '请确认通过 tools/serve.mjs 启动的 http://127.0.0.1 地址访问，而不是直接双击打开文件。';
+        }
+      }, true);
+      setTimeout(() => {
+        const el = document.getElementById('overlay-text');
+        if (el && el.textContent.includes('正在加载')) {
+          document.getElementById('overlay-sub').textContent =
+            '仍在加载…若长时间无响应，请检查浏览器控制台，或改用 npm run serve 启动的 http://127.0.0.1 地址访问。';
+        }
+      }, 15000);
+    </script>
+  </body>
+</html>

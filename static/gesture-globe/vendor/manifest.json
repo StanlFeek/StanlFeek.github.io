@@ -1,0 +1,144 @@
+{
+  "generatedAt": "2026-10-16T04:52:23.964Z",
+  "purpose": "本目录为第三方开源资源的本地副本，使网页无需联网/CDN 即可运行。",
+  "versions": {
+    "three": "0.169.0",
+    "mediapipeTasksVision": "0.10.35",
+    "threeGlobeAssets": "2.44.0"
+  },
+  "sources": [
+    {
+      "name": "three.js",
+      "version": "0.169.0",
+      "license": "MIT",
+      "url": "https://github.com/mrdoob/three.js"
+    },
+    {
+      "name": "MediaPipe Tasks Vision",
+      "version": "0.10.35",
+      "license": "Apache-2.0",
+      "url": "https://github.com/google-ai-edge/mediapipe"
+    },
+    {
+      "name": "hand_landmarker model (float16)",
+      "license": "Apache-2.0",
+      "url": "https://storage.googleapis.com/mediapipe-models/hand_landmarker/"
+    },
+    {
+      "name": "Gesture Recognizer model (float16)",
+      "license": "Apache-2.0",
+      "url": "https://ai.google.dev/edge/mediapipe/solutions/vision/gesture_recognizer"
+    },
+    {
+      "name": "Earth textures (NASA Blue/Black Marble)",
+      "license": "Public Domain (NASA)",
+      "url": "https://visibleearth.nasa.gov/"
+    },
+    {
+      "name": "texture distribution via three-globe examples",
+      "version": "2.44.0",
+      "license": "MIT",
+      "url": "https://github.com/vasturiano/three-globe"
+    }
+  ],
+  "files": [
+    {
+      "path": "mediapipe/models/gesture_recognizer.task",
+      "bytes": 8373440,
+      "note": "Trained gesture classifier and 3D hand landmarks; local inference",
+      "origin": "https://storage.googleapis.com/mediapipe-models/gesture_recognizer/gesture_recognizer/float16/1/gesture_recognizer.task",
+      "sha256": "97952348cf6a6a4915c2ea1496b4b37ebabc50cbbf80571435643c455f2b0482"
+    },
+    {
+      "path": "three/three.module.js",
+      "bytes": 1304820,
+      "note": "three.js r0.169.0 渲染引擎 (ESM)",
+      "origin": "npm:three/build/three.module.js",
+      "sha256Base64": null
+    },
+    {
+      "path": "three/LICENSE",
+      "bytes": 1081,
+      "note": "three.js 许可证 (MIT)",
+      "origin": "npm:three/LICENSE",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/vision_bundle.mjs",
+      "bytes": 136993,
+      "note": "MediaPipe Tasks Vision (ESM)",
+      "origin": "npm:@mediapipe/tasks-vision/vision_bundle.mjs",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/wasm/vision_wasm_internal.js",
+      "bytes": 322044,
+      "note": "WASM 加载器 (SIMD)",
+      "origin": "npm:@mediapipe/tasks-vision/wasm/vision_wasm_internal.js",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/wasm/vision_wasm_internal.wasm",
+      "bytes": 11153617,
+      "note": "WASM 运行时 (SIMD)",
+      "origin": "npm:@mediapipe/tasks-vision/wasm/vision_wasm_internal.wasm",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/wasm/vision_wasm_nosimd_internal.js",
+      "bytes": 321847,
+      "note": "WASM 加载器 (无 SIMD 回退)",
+      "origin": "npm:@mediapipe/tasks-vision/wasm/vision_wasm_nosimd_internal.js",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/wasm/vision_wasm_nosimd_internal.wasm",
+      "bytes": 10481398,
+      "note": "WASM 运行时 (无 SIMD 回退)",
+      "origin": "npm:@mediapipe/tasks-vision/wasm/vision_wasm_nosimd_internal.wasm",
+      "sha256Base64": null
+    },
+    {
+      "path": "mediapipe/models/hand_landmarker.task",
+      "bytes": 7819105,
+      "note": "手部 21 关键点检测模型 (float16, 7.46 MB)",
+      "origin": "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/1/hand_landmarker.task",
+      "sha256Base64": "+8KjAIDDxVcJO13fwzRpgTLrNBBEzO4yLM+LzzYHzeE="
+    },
+    {
+      "path": "textures/earth-blue-marble.jpg",
+      "bytes": 1461877,
+      "note": "地球昼面贴图 (NASA Blue Marble, 4096x2048)",
+      "origin": "download:https://registry.npmmirror.com/three-globe/2.44.0/files/example/img/earth-blue-marble.jpg",
+      "sha256Base64": null
+    },
+    {
+      "path": "textures/earth-night.jpg",
+      "bytes": 715000,
+      "note": "夜间城市灯光贴图 (NASA Black Marble, 4096x2048)",
+      "origin": "download:https://registry.npmmirror.com/three-globe/2.44.0/files/example/img/earth-night.jpg",
+      "sha256Base64": null
+    },
+    {
+      "path": "textures/earth-topology.png",
+      "bytes": 378243,
+      "note": "地形高度贴图：亮=陆地、暗=海洋，用于凹凸起伏 (2048x1024)",
+      "origin": "download:https://registry.npmmirror.com/three-globe/2.44.0/files/example/img/earth-topology.png",
+      "sha256Base64": null
+    },
+    {
+      "path": "textures/earth-water.png",
+      "bytes": 430200,
+      "note": "水面遮罩：亮=海洋、暗=陆地（已用昼面贴图交叉验证），用于海面镜面高光 (1600x800)",
+      "origin": "download:https://registry.npmmirror.com/three-globe/2.44.0/files/example/img/earth-water.png",
+      "sha256Base64": null
+    },
+    {
+      "path": "textures/earth-clouds.png",
+      "bytes": 5033486,
+      "note": "云层贴图 RGBA (4096x2048)：白色云体自带宽高、alpha 中位 165；海洋区域 alpha=0 完全透明，故用 alphaMap 控制不透明度",
+      "origin": "download:https://registry.npmmirror.com/three-globe/2.44.0/files/example/clouds/clouds.png",
+      "sha256Base64": null
+    }
+  ]
+}
