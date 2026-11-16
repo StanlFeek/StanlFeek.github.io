@@ -27,21 +27,33 @@
   var CACHE_KEY = "dm-global-cache";
   var CACHE_TTL = 5 * 60 * 1000;
 
+  // 「减少动态效果」不再整层移除：那条分支会把右下角开关一起删掉，
+  // 页面上就再无入口能把弹幕打开（留言板走的是独立的 danmaku.js，所以会
+  // 表现为「只有留言板还有弹幕」）。现在只把默认状态设为关，开关保持可见。
   var reduced =
     window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-  var saveData =
-    navigator.connection &&
-    (navigator.connection.saveData ||
-      /(^|-)2g$/.test(navigator.connection.effectiveType || ""));
 
-  if (reduced || saveData) {
-    root.remove();
-    return;
+  // 也不再读 navigator.connection.saveData / 2g：
+  // 一个 5 分钟本地缓存的评论请求省不了多少流量，却会让弹幕在弱网下整层消失。
+
+  function readStore() {
+    try {
+      return localStorage.getItem(STORE);
+    } catch (e) {
+      return null;
+    }
   }
 
-  var off = false;
+  var stored = readStore();
+  var off = stored === "1";
+  // 系统要求减少动效、且用户从未表过态时，默认关；用户点过开关则尊重其选择
+  if (reduced && stored === null) off = true;
+
+  // 自助开关：?dm=1 强制开、?dm=0 强制关，不必清 localStorage
   try {
-    off = localStorage.getItem(STORE) === "1";
+    var force = new URLSearchParams(location.search).get("dm");
+    if (force === "1") off = false;
+    else if (force === "0") off = true;
   } catch (e) {}
 
   var items = [];
@@ -116,8 +128,13 @@
   }
 
   function start() {
-    if (off || !items.length) return;
+    // 容器永远不藏：开关住在容器里，藏容器等于把开关一起藏了
     root.hidden = false;
+    if (off || !items.length) {
+      root.classList.add("is-off");
+      return;
+    }
+    root.classList.remove("is-off");
     measureLanes();
     spawn();
     var loop = function () {
@@ -131,13 +148,20 @@
     if (timer) clearTimeout(timer);
     timer = null;
     stage.textContent = "";
-    root.hidden = true;
+    // 只藏舞台（.dm-global.is-off .dm-global-stage{display:none}），
+    // 不设 root.hidden —— 否则右下角开关跟着消失，用户再也打不开弹幕
+    root.classList.add("is-off");
   }
 
   function paintToggle() {
     root.classList.toggle("is-off", off);
     toggle.textContent = off ? "弹幕 关" : "弹幕 开";
     toggle.setAttribute("aria-pressed", off ? "false" : "true");
+    toggle.title = off
+      ? reduced
+        ? "系统开启了「减少动态效果」，点一下仍可强制打开弹幕"
+        : "点一下打开全站弹幕"
+      : "点一下关闭全站弹幕";
   }
 
   toggle.addEventListener("click", function () {
@@ -207,6 +231,9 @@
       .catch(function () {});
   }
 
+  // 容器一开始就放出来：保证右下角开关始终存在。
+  // 之前 off 或弱网时整层被移除/隐藏，开关跟着消失，页面上再无入口。
+  root.hidden = false;
   paintToggle();
 
   // header 高度会随字号/换行变化，量出来喂给 sticky 偏移
